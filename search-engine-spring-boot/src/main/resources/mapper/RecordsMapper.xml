@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--绑定一个对应的Dao/Map接口-->
+<mapper namespace="com.searchengine.dao.RecordDao">
+    <select id="selectAllRecords" resultType="com.searchengine.entity.Record">
+        select * from data
+    </select>
+</mapper>
