@@ -9,4 +9,6 @@ import java.util.List;
 public interface RecordDao {
 
     List<Record> selectAllRecords();
+
+    List<Record> selectRecordsByWord(String word);
 }

@@ -4,6 +4,7 @@ import com.searchengine.entity.Record;
 import com.searchengine.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,5 +22,11 @@ public class RecordController {
         long end=System.currentTimeMillis();
         System.out.println((end-start)+"ms");
         return records;
+    }
+
+    @GetMapping("/s_word")
+    public List<Record> getRecordByWord(@RequestParam("word") String word){
+        System.out.println(word);
+        return recordService.queryRecordByWord(word);
     }
 }

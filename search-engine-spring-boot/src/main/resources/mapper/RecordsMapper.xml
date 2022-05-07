@@ -7,4 +7,8 @@
     <select id="selectAllRecords" resultType="com.searchengine.entity.Record">
         select * from data
     </select>
+
+    <select id="selectRecordsByWord" resultType="com.searchengine.entity.Record">
+        select * from data where caption like #{word}
+    </select>
 </mapper>

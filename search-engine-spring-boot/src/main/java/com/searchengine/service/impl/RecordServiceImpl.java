@@ -18,4 +18,10 @@ public class RecordServiceImpl implements RecordService {
     public List<Record> queryAllRecord() {
         return recordDao.selectAllRecords();
     }
+
+    @Override
+    public List<Record> queryRecordByWord(String word) {
+        word = "%" + word + "%";
+        return recordDao.selectRecordsByWord(word);
+    }
 }
