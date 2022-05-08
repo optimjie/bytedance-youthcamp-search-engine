@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.searchengine.dao.RecordSegDao">
+    <resultMap id="RecordSegMap" type="com.searchengine.entity.RecordSeg">
+        <id column="id" property="id"></id>
+        <result column="data_id" property="dataId"></result>
+        <result column="seg_id" property="segId"></result>
+        <result column="tidif_value" property="tidifValue"></result>
+        <result column="count" property="count"></result>
+        <result column="weight" property="weight"></result>
+
+<!--        <association property="Seg" javaType="com.searchengine.entity.Segmentation">-->
+<!--            <id column="segid" property="id"></id>-->
+<!--            <result column="word" property="word"></result>-->
+<!--        </association>-->
+
+<!--        <association property="Record" javaType="com.searchengine.entity.Record">-->
+<!--            <id column="recordid" property="id"></id>-->
+<!--            <result column="url" property="url"></result>-->
+<!--            <result column="caption" property="caption"></result>-->
+<!--        </association>-->
+    </resultMap>
+
+    <select id="selectAllRecordSeg" resultType="com.searchengine.entity.RecordSeg">
+        select * from data_seg_relation
+    </select>
+
+    <select id="selectOneRecordSeg" resultType="com.searchengine.entity.RecordSeg" parameterType="java.lang.Long">
+        SELECT * FROM data_seg_relation WHERE data_id=#{dataId} AND seg_id=#{segId}
+    </select>
+
+    <select id="selectRecordBySeg" resultType="com.searchengine.entity.RecordSeg" parameterType="java.lang.Long">
+        SELECT * FROM data_seg_relation WHERE seg_id=#{segId}
+    </select>
+
+    <insert id="insertRecordSeg" parameterType="com.searchengine.entity.RecordSeg">
+        insert into data_seg_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dataId != null">
+                data_id,
+            </if>
+            <if test="segId != null">
+                seg_id,
+            </if>
+            <if test="tidifValue != null">
+                tidif_value,
+            </if>
+            <if test="count != null">
+                count,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dataId != null">
+                #{dataId},
+            </if>
+            <if test="segId != null">
+                #{segId},
+            </if>
+            <if test="tidifValue != null">
+                #{tidifValue},
+            </if>
+            <if test="count != null">
+                #{count},
+            </if>
+            <if test="weight != null">
+                #{weight},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateRecordSeg" parameterType="com.searchengine.entity.RecordSeg">
+        update data_seg_relation
+        <set>
+            <if test="dataId != null">
+                data_id = #{dataId},
+            </if>
+            <if test="segId != null">
+                seg_id = #{segId},
+            </if>
+            <if test="tidifValue != null">
+                tidif_value = #{tidifValue},
+            </if>
+            <if test="count != null">
+                count = #{count},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+</mapper>

@@ -7,4 +7,8 @@
     <select id="selectAllRecords" resultType="com.searchengine.entity.Record">
         select * from data
     </select>
+
+    <select id="selectById" resultType="com.searchengine.entity.Record" parameterType="long">
+        SELECT * FROM data where id=#{id}
+    </select>
 </mapper>

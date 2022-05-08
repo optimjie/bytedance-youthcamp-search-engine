@@ -51,6 +51,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--jieba分词java版-->
+        <dependency>
+            <groupId>com.huaban</groupId>
+            <artifactId>jieba-analysis</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--绑定一个对应的Dao/Map接口-->
+<mapper namespace="com.searchengine.dao.SegmentationDao">
+    <resultMap id="segmentationMap" type="com.searchengine.entity.Segmentation">
+        <id column="segid" property="id"></id>
+        <result column="word" property="word"></result>
+
+<!--        <association property="record" javaType="com.searchengine.entity.Record">-->
+<!--            <id column="recordid" property="id"></id>-->
+<!--            <result column="url" property="url"></result>-->
+<!--            <result column="caption" property="caption"></result>-->
+<!--        </association>-->
+
+<!--        <association property="RecordSeg" javaType="com.searchengine.entity.RecordSeg">-->
+<!--            <id column="id" property="id"></id>-->
+<!--            <result column="recordid" property="recordId"></result>-->
+<!--            <result column="segid" property="segId"></result>-->
+<!--            <result column="tidifvalue" property="tidifValue"></result>-->
+<!--            <result column="weight" property="weight"></result>-->
+<!--        </association>-->
+
+    </resultMap>
+
+    <select id="selectAllSeg" resultType="com.searchengine.entity.Segmentation">
+        select * from segmentation
+    </select>
+
+    <select id="selectOneSeg" resultType="com.searchengine.entity.Segmentation" parameterType="java.lang.String">
+        SELECT * FROM segmentation WHERE word=#{word}
+    </select>
+
+    <insert id="insertSeg" parameterType="java.lang.String">
+        insert into segmentation (word)
+        values (#{word})
+    </insert>
+
+
+</mapper>
