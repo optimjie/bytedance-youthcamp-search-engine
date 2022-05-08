@@ -65,4 +65,10 @@ public class RecordController {
 
         return recordList;
     }
+
+    @GetMapping("/s_word")
+    public List<Record> getRecordByWord(@RequestParam("word") String word){
+        System.out.println(word);
+        return recordService.queryRecordByWord(word);
+    }
 }
