@@ -48,7 +48,7 @@ public class RecordController {
     }
 
     @GetMapping("/search")
-    public List<Record> search(@RequestBody String searchInfo){
+    public List<Record> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
         log.info(searchInfo);
         List<Record> recordList = new ArrayList<>();
@@ -69,6 +69,7 @@ public class RecordController {
     @GetMapping("/s_word")
     public List<Record> getRecordByWord(@RequestParam("word") String word){
         System.out.println(word);
+        log.info(word);
         return recordService.queryRecordByWord(word);
     }
 }
