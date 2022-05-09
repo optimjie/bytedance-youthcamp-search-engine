@@ -1,10 +1,14 @@
 package com.searchengine.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
 import com.searchengine.dao.RecordDao;
+import com.searchengine.dao.RecordSegDao;
 import com.searchengine.dao.SegmentationDao;
+import com.searchengine.dto.RecordDto;
 import com.searchengine.entity.Record;
+import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
@@ -12,10 +16,12 @@ import com.searchengine.service.SegmentationService;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -37,6 +43,9 @@ public class RecordController {
     @Autowired
     private SegmentationDao segmentationDao;
 
+    @Autowired
+    private RecordSegDao recordSegDao;
+
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
     JiebaSegmenter segmenter = new JiebaSegmenter();
 
@@ -53,33 +62,96 @@ public class RecordController {
         return records;
     }
 
+//    /**
+//     * 分词查询
+//     * @param searchInfo
+//     * @return
+//     */
+//    @GetMapping("/search")
+//    public List<Record> search(@RequestParam("word") String searchInfo){
+//        //调用jieba分词进行分词
+//        log.info(searchInfo);
+//        List<Record> recordList = new ArrayList<>();
+//        List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.INDEX);
+//        for (SegToken token : segTokens) {
+//            //查出每个分词对应的caption
+//            log.info("分词为{}",token.word);
+//            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+//            if (oneSeg!=null) {
+//                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);
+//                for (Long dataId : RecordsIdList) {
+//                    recordList.add(recordDao.selectById(dataId));
+//                }
+//            }
+//        }
+//
+//
+//        return recordList;
+//    }
+
     /**
-     * 分词查询
+     * 分词查询  根据tidif值从大到小排序
      * @param searchInfo
      * @return
      */
     @GetMapping("/search")
-    public List<Record> search(@RequestParam("word") String searchInfo){
+    public List<RecordDto> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
         log.info(searchInfo);
         List<Record> recordList = new ArrayList<>();
         List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.INDEX);
+        List<RecordDto> recordDtoList = new ArrayList<>();
         for (SegToken token : segTokens) {
+
             //查出每个分词对应的caption
             log.info("分词为{}",token.word);
             Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            Double tidif = new Double(0);
             if (oneSeg!=null) {
-                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);
+                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
+
                 for (Long dataId : RecordsIdList) {
-                    recordList.add(recordDao.selectById(dataId));
+                    //对于每个record对象 查询该分词对应的tidif加入recordDto
+                    RecordDto recordDto = new RecordDto();
+                    BeanUtils.copyProperties(recordDao.selectById(dataId),recordDto);
+                    if (recordDto.getRecordSegs()==null){
+                        List<RecordSeg> recordSegList= new ArrayList<>();
+                        RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
+                        tidif =recordSeg.getTidifValue();
+                        recordSegList.add(recordSeg);
+                        recordDto.setRecordSegs(recordSegList);
+                    }else {
+                        List<RecordSeg> recordSegs = recordDto.getRecordSegs();
+                        RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
+                        tidif =recordSeg.getTidifValue();
+                        recordSegs.add(recordSeg);
+                        recordDto.setRecordSegs(recordSegs);
+                    }
+                    Double weight = recordDto.getWeight() + tidif;
+                    recordDto.setWeight(weight);
+                    recordDtoList.add(recordDto);
                 }
             }
         }
 
+        //选择排序  忘了springboot里咋排序了 先凑合用
+        for (int i = 0; i < recordDtoList.size()-1; i++) {
+            int index = i;
+            for (int j = i + 1; j < recordDtoList.size(); j++) {
+                if(recordDtoList.get(index).getWeight() > recordDtoList.get(j).getWeight()){
+                    index = j;
+                }
+            }
+            RecordDto tmp = recordDtoList.get(i);
+            recordDtoList.set(i,recordDtoList.get(index));
+            recordDtoList.set(index,tmp);
+        }
+        Collections.reverse(recordDtoList);
 
-        return recordList;
+
+
+        return recordDtoList;
     }
-
     /**
      * 新增文本
      * @param record
