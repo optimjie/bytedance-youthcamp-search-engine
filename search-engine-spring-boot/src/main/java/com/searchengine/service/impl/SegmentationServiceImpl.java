@@ -27,26 +27,27 @@ public class SegmentationServiceImpl implements SegmentationService {
     @Override
     public Boolean addSeg(String word,Long dataId) {
 
-        Segmentation segmentation = new Segmentation();
+//        Segmentation segmentation = new Segmentation();
         Segmentation seg = segmentationDao.selectOneSeg(word);
         if (seg == null){
             //分词不存在 加入分词表
             segmentationDao.insertSeg(word);
         }
         Long segId = segmentationDao.selectOneSeg(word).getId();
+
         //加入关系表
         RecordSeg recordSeg = new RecordSeg();
         recordSeg.setSegId(segId);
         recordSeg.setDataId(dataId);
-        if (recordSegDao.selectOneRecordSeg(dataId,segId)==null) {
+        RecordSeg rs = recordSegDao.selectOneRecordSeg(dataId, segId);
+        if (rs==null) {
             recordSeg.setCount(1);
             recordSegDao.insertRecordSeg(recordSeg);
         }
         else {
-            //文中出现次数+1
-            int count = recordSeg.getCount();
-            count++;
-            recordSeg.setCount(count);
+            int count = rs.getCount();
+            //文中出现次数>1
+            recordSeg.setCount(++count);
             recordSegDao.updateRecordSeg(recordSeg);
         }
 

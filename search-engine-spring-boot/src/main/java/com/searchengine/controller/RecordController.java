@@ -38,6 +38,10 @@ public class RecordController {
 
     JiebaSegmenter segmenter = new JiebaSegmenter();
 
+    /**
+     * 查询所有文本
+     * @return
+     */
     @GetMapping("/getAll")
     public List<Record> getAllRecord(){
         long start = System.currentTimeMillis();
@@ -47,6 +51,11 @@ public class RecordController {
         return records;
     }
 
+    /**
+     * 分词查询
+     * @param searchInfo
+     * @return
+     */
     @GetMapping("/search")
     public List<Record> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
@@ -69,10 +78,37 @@ public class RecordController {
         return recordList;
     }
 
+    /**
+     * 新增文本
+     * @param record
+     * @return
+     */
+    @PostMapping("/add")
+    public boolean add(Record record){
+        //文本信息加入data表
+        recordDao.insertRecord(record);
+        //分词处理
+        String sentence = record.getCaption();
+        List<SegToken> segTokens = segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
+        Long recordId = record.getId();
+        for (SegToken segToken : segTokens) {
+            //分词信息加入分词表
+            segmentationService.addSeg(segToken.word,recordId);
+        }
+        return true;
+    }
+
+    /**
+     * 模糊查询
+     * @param word
+     * @return
+     */
     @GetMapping("/s_word")
     public List<Record> getRecordByWord(@RequestParam("word") String word){
         System.out.println(word);
         log.info(word);
         return recordService.queryRecordByWord(word);
     }
+
+
 }

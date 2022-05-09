@@ -4,6 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--绑定一个对应的Dao/Map接口-->
 <mapper namespace="com.searchengine.dao.RecordDao">
+    <resultMap id="RecordMap" type="com.searchengine.entity.Record">
+        <id column="id" property="id"></id>
+        <result column="url" property="url"></result>
+        <result column="caption" property="caption"></result>
+    </resultMap>
     <select id="selectAllRecords" resultType="com.searchengine.entity.Record">
         select * from data
     </select>
@@ -15,4 +20,24 @@
     <select id="selectRecordsByWord" resultType="com.searchengine.entity.Record">
         select * from data where caption like #{word}
     </select>
+
+    <insert id="insertRecord" parameterType="com.searchengine.entity.Record">
+        insert into data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="url != null">
+                url,
+            </if>
+            <if test="caption != null">
+                caption,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="url != null">
+                #{url},
+            </if>
+            <if test="caption != null">
+                #{caption},
+            </if>
+        </trim>
+    </insert>
 </mapper>

@@ -14,4 +14,6 @@ public interface RecordDao {
     List<Record> selectRecordsByWord(String word);
 
     Record selectById(@Param("id") Long id);
+
+    int insertRecord(Record record);
 }
