@@ -2,12 +2,25 @@
 
 1.基于mysql建立分词库实现倒排索引查询
 
-分词库sql文件在/static-file/search_engine.sql
 
 
 
 # TODO
 
-1.mysql查询效率问题，目前sql文件只导入了7w左右个分词（50k的小数据包分词量应该在50w左右），在test下面的/segmentation/addAllSeg，需要优化or换成别的数据库（RDB？）；
+1.mysql查询效率问题，目前sql文件已导入50k的全部分词（共11w左右）和关系表（63w左右），分词库sql文件在/static-files/search_engine.sql；
 
 2.分词数据清洗（"的" "了" 空格以及符号等无意义数据）；
+
+3.数据库写入tidif值
+
+
+
+n.以图搜图功能 可以采用CNN+Milvus
+
+  参考
+  
+  https://milvus.io/docs/v2.0.x/image_similarity_search.md
+  
+  https://blog.csdn.net/qq_29220369/article/details/120523530 
+  
+  https://www.csdn.net/tags/MtTaEg4sOTEzMjUyLWJsb2cO0O0O.html
