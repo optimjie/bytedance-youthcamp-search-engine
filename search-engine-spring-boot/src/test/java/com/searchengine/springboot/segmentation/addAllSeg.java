@@ -114,7 +114,7 @@ public class addAllSeg {
     public void addTIDIF(){
 
         //查询每个dataId对应分词的tidif值
-        for (int i = 0; i < 50258; i++) {
+        for (int i = 1; i <= 50258; i++) {
             Long l = new Long(i);
             Record record = recordDao.selectById(l);
             List<Keyword> list=tfidfAnalyzer.analyze(record.getCaption(),5);
