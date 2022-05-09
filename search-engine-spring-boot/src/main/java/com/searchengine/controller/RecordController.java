@@ -9,6 +9,8 @@ import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
+import com.searchengine.utils.jieba.keyword.Keyword;
+import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,7 @@ public class RecordController {
     @Autowired
     private SegmentationDao segmentationDao;
 
-
+    TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
     JiebaSegmenter segmenter = new JiebaSegmenter();
 
     /**
@@ -90,10 +92,18 @@ public class RecordController {
         //分词处理
         String sentence = record.getCaption();
         List<SegToken> segTokens = segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
+        List<Keyword> list=tfidfAnalyzer.analyze(sentence,5);
         Long recordId = record.getId();
+        Double tidifValue = new Double(0);
         for (SegToken segToken : segTokens) {
+            //对应tidif值
+            for (Keyword keyword : list) {
+                if (keyword.getName()==segToken.word){
+                    tidifValue = keyword.getTfidfvalue();
+                }
+            }
             //分词信息加入分词表
-            segmentationService.addSeg(segToken.word,recordId);
+            segmentationService.addSeg(segToken.word,recordId,tidifValue);
         }
         return true;
     }

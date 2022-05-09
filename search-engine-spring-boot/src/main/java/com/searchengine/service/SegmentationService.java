@@ -10,7 +10,7 @@ public interface SegmentationService {
 
     List<Segmentation> queryAllSeg();
 
-    Boolean addSeg(String word,Long recordId);
+    Boolean addSeg(String word,Long recordId,Double tidifValue);
 
 
 }
