@@ -57,11 +57,14 @@ public class RecordController {
             //查出每个分词对应的caption
             log.info("分词为{}",token.word);
             Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
-            List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);
-            for (Long Recordid : RecordsIdList) {
-                recordList.add(recordDao.selectById(Recordid));
+            if (oneSeg!=null) {
+                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);
+                for (Long dataId : RecordsIdList) {
+                    recordList.add(recordDao.selectById(dataId));
+                }
             }
         }
+
 
         return recordList;
     }

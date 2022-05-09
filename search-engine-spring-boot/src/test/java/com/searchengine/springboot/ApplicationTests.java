@@ -17,13 +17,12 @@ class ApplicationTests {
     private RecordSegDao recordSegDao;
     @Test
     void contextLoads() {
-        Long l =new Long(7042);
-        List<Long> recordIdlist= new ArrayList<>();
-        for (RecordSeg recordSeg : recordSegDao.selectRecordBySeg(l)) {
-            System.out.println(recordSeg.getDataId());
-            recordIdlist.add(recordSeg.getDataId());
-
-        }
+        RecordSeg recordSeg = new RecordSeg();
+        Long l = new Long(1);
+        recordSeg.setDataId(l);
+        recordSeg.setSegId(l);
+        recordSeg.setCount(2);
+        recordSegDao.updateRecordSeg(recordSeg);
 
     }
 

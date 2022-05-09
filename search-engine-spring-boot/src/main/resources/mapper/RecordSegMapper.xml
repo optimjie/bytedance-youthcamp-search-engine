@@ -76,12 +76,12 @@
     <update id="updateRecordSeg" parameterType="com.searchengine.entity.RecordSeg">
         update data_seg_relation
         <set>
-            <if test="dataId != null">
-                data_id = #{dataId},
-            </if>
-            <if test="segId != null">
-                seg_id = #{segId},
-            </if>
+<!--            <if test="dataId != null">-->
+<!--                data_id = #{dataId},-->
+<!--            </if>-->
+<!--            <if test="segId != null">-->
+<!--                seg_id = #{segId},-->
+<!--            </if>-->
             <if test="tidifValue != null">
                 tidif_value = #{tidifValue},
             </if>
@@ -92,7 +92,7 @@
                 weight = #{weight},
             </if>
         </set>
-        where id = #{id}
+        where data_id = #{dataId} AND seg_id = #{segId}
     </update>
 
 

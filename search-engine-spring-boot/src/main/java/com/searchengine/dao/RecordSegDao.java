@@ -12,7 +12,7 @@ public interface RecordSegDao {
     //查看所有关系
     List<RecordSeg> selectAllRecordSeg();
     //根据recordid和segid查询单个关系
-    RecordSeg selectOneRecordSeg(@Param("recordId") Long recordId, @Param("segId") Long segId);
+    RecordSeg selectOneRecordSeg(@Param("dataId") Long recordId, @Param("segId") Long segId);
     //根据segId查找对应的recordId
     List<RecordSeg> selectRecordBySeg(@Param("segId") Long segId);
     //存储关系表
