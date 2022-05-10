@@ -24,4 +24,9 @@ public class RecordServiceImpl implements RecordService {
         word = "%" + word + "%";
         return recordDao.selectRecordsByWord(word);
     }
+
+    @Override
+    public List<Record> queryRecordFilter(String word) {
+        return recordDao.selectRecordsFilter(word);
+    }
 }

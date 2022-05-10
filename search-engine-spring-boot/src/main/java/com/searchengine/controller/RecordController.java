@@ -20,9 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 @RestController
 @Slf4j
@@ -98,6 +97,38 @@ public class RecordController {
     public List<RecordDto> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
         log.info(searchInfo);
+
+        // ======检查是否需要过滤======start
+        Set<Long> set = new HashSet<>();
+        List<SegToken> segTokensFilter = new ArrayList<>();
+        String[] searchWords = searchInfo.split("\\s+");
+        for (int i = searchWords.length - 1; i >= 1; i--) {
+            if (Pattern.matches("^-.*?$", searchWords[i])) {
+                List<SegToken> l = segmenter.process(searchWords[i].substring(1, searchWords[i].length()), JiebaSegmenter.SegMode.INDEX);
+                for (SegToken v : l) {
+                    segTokensFilter.add(v);
+                }
+            } else {
+                break;
+            }
+        }
+        for (SegToken token : segTokensFilter) {
+            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            if (oneSeg != null) {
+                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
+                for (Long v : RecordsIdList) {
+                    set.add(v);
+                }
+            }
+        }
+        String temp = "";
+        String[] strs = searchInfo.split(" ");
+        for (String v : strs) {
+            if (!Pattern.matches("^-.*?$", v)) temp = temp + v;
+        }
+        searchInfo = temp;
+        // ======检查是否需要过滤======end
+
         List<Record> recordList = new ArrayList<>();
         List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.INDEX);
         List<RecordDto> recordDtoList = new ArrayList<>();
@@ -109,8 +140,8 @@ public class RecordController {
             Double tidif = new Double(0);
             if (oneSeg!=null) {
                 List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
-
                 for (Long dataId : RecordsIdList) {
+                    if (set.contains(dataId)) continue;  // 若包含需要过滤的词 continue
                     //对于每个record对象 查询该分词对应的tidif加入recordDto
                     RecordDto recordDto = new RecordDto();
                     BeanUtils.copyProperties(recordDao.selectById(dataId),recordDto);

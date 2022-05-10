@@ -11,4 +11,6 @@ public interface RecordService {
     List<Record> queryAllRecord();
 
     List<Record> queryRecordByWord(String word);
+
+    List<Record> queryRecordFilter(String word);
 }

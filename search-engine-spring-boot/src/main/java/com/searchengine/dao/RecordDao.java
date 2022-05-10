@@ -13,6 +13,8 @@ public interface RecordDao {
 
     List<Record> selectRecordsByWord(String word);
 
+    List<Record> selectRecordsFilter(String word);
+
     Record selectById(@Param("id") Long id);
 
     int insertRecord(Record record);
