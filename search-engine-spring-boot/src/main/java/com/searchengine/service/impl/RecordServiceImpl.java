@@ -59,10 +59,11 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-<<<<<<< HEAD
     public List<Record> queryRecordFilter(String word) {
-        return recordDao.selectRecordsFilter(word);
-=======
+        return null;
+    }
+
+    @Override
     public List<RecordDto> search(String searchInfo) {
         Set<Long> recordIds = new HashSet<>();
         List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.SEARCH);
@@ -137,6 +138,5 @@ public class RecordServiceImpl implements RecordService {
             segmentationService.addSeg(segToken.word,recordId,tidifValue);
         }
         return true;
->>>>>>> d25f4753dc6ea31faadb14ca9d5c71b674e4faaa
     }
 }
