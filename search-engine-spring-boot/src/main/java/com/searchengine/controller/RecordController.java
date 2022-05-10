@@ -30,8 +30,7 @@ public class RecordController {
     @Autowired
     private RecordService recordService;
 
-    @Autowired
-    private RecordDao recordDao;
+
 
     @Autowired
     private SegmentationService segmentationService;
@@ -39,11 +38,7 @@ public class RecordController {
     @Autowired
     private RecordSegService recordSegService;
 
-    @Autowired
-    private SegmentationDao segmentationDao;
 
-    @Autowired
-    private RecordSegDao recordSegDao;
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
     JiebaSegmenter segmenter = new JiebaSegmenter();
@@ -97,6 +92,7 @@ public class RecordController {
     public List<RecordDto> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
         log.info(searchInfo);
+<<<<<<< HEAD
 
         // ======检查是否需要过滤======start
         Set<Long> set = new HashSet<>();
@@ -164,6 +160,10 @@ public class RecordController {
                 }
             }
         }
+=======
+        List<RecordDto> recordDtoList = recordService.search(searchInfo);
+
+>>>>>>> d25f4753dc6ea31faadb14ca9d5c71b674e4faaa
 
         //选择排序  忘了springboot里咋排序了 先凑合用
         for (int i = 0; i < recordDtoList.size()-1; i++) {
@@ -190,25 +190,7 @@ public class RecordController {
      */
     @PostMapping("/add")
     public boolean add(Record record){
-        //文本信息加入data表
-        recordDao.insertRecord(record);
-        //分词处理
-        String sentence = record.getCaption();
-        List<SegToken> segTokens = segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
-        List<Keyword> list=tfidfAnalyzer.analyze(sentence,5);
-        Long recordId = record.getId();
-        Double tidifValue = new Double(0);
-        for (SegToken segToken : segTokens) {
-            //对应tidif值
-            for (Keyword keyword : list) {
-                if (keyword.getName()==segToken.word){
-                    tidifValue = keyword.getTfidfvalue();
-                }
-            }
-            //分词信息加入分词表
-            segmentationService.addSeg(segToken.word,recordId,tidifValue);
-        }
-        return true;
+        return recordService.addRecord(record);
     }
 
     /**
