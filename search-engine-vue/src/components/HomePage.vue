@@ -10,7 +10,7 @@
         <el-button slot="reference" icon="el-icon-folder" circle></el-button>
       </el-popover>
       <span>&nbsp;&nbsp;</span>
-      <el-popover
+      <el-popover 
           placement="bottom"
           title="用户"
           width="300"
@@ -21,7 +21,7 @@
     </el-row>
     <el-row id="input">
       <img src="~@/assets/1057.png" alt="">
-        <el-input v-model="input_value" placeholder="请输入搜索内容" prefix-icon="el-icon-search">
+        <el-input v-model="search_word" placeholder="请输入搜索内容" prefix-icon="el-icon-search">
           <el-button style="margin-right:10px" slot="suffix" type="text" @click="search">搜索</el-button>
         </el-input>
     </el-row>
@@ -33,12 +33,16 @@
 export default {
   data() {
     return {
-      input_value: '',
+      search_word: '',
     }
   },
   methods: {
     search() {
       // 需要请求数据来显示
+      this.$router.push({
+        path: '/search',
+        query: { word : this.search_word }
+      });
     }
   }
 };
