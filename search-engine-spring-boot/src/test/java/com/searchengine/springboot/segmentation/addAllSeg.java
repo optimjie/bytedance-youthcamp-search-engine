@@ -1,6 +1,5 @@
 package com.searchengine.springboot.segmentation;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
 import com.searchengine.dao.RecordDao;
@@ -17,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -116,7 +113,8 @@ public class addAllSeg {
         //查询每个dataId对应分词的tidif值
         for (int i = 39357; i <= 50258; i++) {
             Long l = new Long(i);
-            Record record = recordDao.selectById(l);
+            //分表查询
+            Record record = recordDao.selectById(l, (int) (l % 2));
             List<Keyword> list=tfidfAnalyzer.analyze(record.getCaption(),5);
             for(Keyword word:list){
                 //对于每个seg和对应的值 存入recordSeg表
