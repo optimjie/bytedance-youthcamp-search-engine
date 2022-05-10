@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -60,6 +61,38 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public List<RecordDto> search(String searchInfo) {
+
+        // ======检查是否需要过滤======start
+        Set<Long> set = new HashSet<>();
+        List<SegToken> segTokensFilter = new ArrayList<>();
+        String[] searchWords = searchInfo.split("\\s+");
+        for (int i = searchWords.length - 1; i >= 1; i--) {
+            if (Pattern.matches("^-.*?$", searchWords[i])) {
+                List<SegToken> l = segmenter.process(searchWords[i].substring(1, searchWords[i].length()), JiebaSegmenter.SegMode.INDEX);
+                for (SegToken v : l) {
+                    segTokensFilter.add(v);
+                }
+            } else {
+                break;
+            }
+        }
+        for (SegToken token : segTokensFilter) {
+            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            if (oneSeg != null) {
+                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
+                for (Long v : RecordsIdList) {
+                    set.add(v);
+                }
+            }
+        }
+        String temp = "";
+        String[] strs = searchInfo.split(" ");
+        for (String v : strs) {
+            if (!Pattern.matches("^-.*?$", v)) temp = temp + v;
+        }
+        searchInfo = temp;
+        // ======检查是否需要过滤======end
+
         Set<Long> recordIds = new HashSet<>();
         List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.SEARCH);
         List<RecordDto> recordDtoList = new ArrayList<>();
@@ -73,7 +106,7 @@ public class RecordServiceImpl implements RecordService {
                 List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
 
                 for (Long dataId : RecordsIdList) {
-
+                    if (set.contains(dataId)) continue;  // 若包含需要过滤的词 continue
                     if (!recordIds.contains(dataId)){
                         RecordDto recordDto = new RecordDto();
                         recordIds.add(dataId);
