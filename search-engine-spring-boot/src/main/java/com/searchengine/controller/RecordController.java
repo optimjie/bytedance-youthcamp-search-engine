@@ -96,7 +96,7 @@ public class RecordController {
         List<RecordDto> recordDtoList = recordService.search(searchInfo);
 
 
-        //选择排序  忘了springboot里咋排序了 先凑合用
+        /*//选择排序  忘了springboot里咋排序了 先凑合用
         for (int i = 0; i < recordDtoList.size()-1; i++) {
             int index = i;
             for (int j = i + 1; j < recordDtoList.size(); j++) {
@@ -108,11 +108,22 @@ public class RecordController {
             recordDtoList.set(i,recordDtoList.get(index));
             recordDtoList.set(index,tmp);
         }
-        Collections.reverse(recordDtoList);
+        Collections.reverse(recordDtoList);*/
 
 
-
-        return recordDtoList;
+        /*自定义排序器根据weight排序*/
+        recordDtoList.sort(new Comparator<RecordDto>() {
+            @Override
+            public int compare(RecordDto o1, RecordDto o2) {
+                if ((o2.getWeight() > o1.getWeight())) return 1;
+                else if((o2.getWeight() < o1.getWeight())) return -1;
+                return 0;
+            }
+        });
+        /*截取结果集recordDtoList*/
+        int start = (pageNum - 1) * pageSize;
+        int end = pageNum * pageSize;
+        return recordDtoList.subList(start, end);   
     }
     /**
      * 新增文本
