@@ -1,5 +1,6 @@
 package com.searchengine.service;
 
+import com.searchengine.dto.RecordDto;
 import com.searchengine.entity.Record;
 import org.springframework.stereotype.Service;
 
@@ -11,4 +12,8 @@ public interface RecordService {
     List<Record> queryAllRecord();
 
     List<Record> queryRecordByWord(String word);
+
+    List<RecordDto> search(String searchInfo);
+
+    Boolean addRecord(Record record);
 }

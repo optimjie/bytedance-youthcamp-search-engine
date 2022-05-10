@@ -31,8 +31,7 @@ public class RecordController {
     @Autowired
     private RecordService recordService;
 
-    @Autowired
-    private RecordDao recordDao;
+
 
     @Autowired
     private SegmentationService segmentationService;
@@ -40,11 +39,7 @@ public class RecordController {
     @Autowired
     private RecordSegService recordSegService;
 
-    @Autowired
-    private SegmentationDao segmentationDao;
 
-    @Autowired
-    private RecordSegDao recordSegDao;
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
     JiebaSegmenter segmenter = new JiebaSegmenter();
@@ -98,41 +93,8 @@ public class RecordController {
     public List<RecordDto> search(@RequestParam("word") String searchInfo){
         //调用jieba分词进行分词
         log.info(searchInfo);
-        List<Record> recordList = new ArrayList<>();
-        List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.INDEX);
-        List<RecordDto> recordDtoList = new ArrayList<>();
-        for (SegToken token : segTokens) {
+        List<RecordDto> recordDtoList = recordService.search(searchInfo);
 
-            //查出每个分词对应的caption
-            log.info("分词为{}",token.word);
-            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
-            Double tidif = new Double(0);
-            if (oneSeg!=null) {
-                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
-
-                for (Long dataId : RecordsIdList) {
-                    //对于每个record对象 查询该分词对应的tidif加入recordDto
-                    RecordDto recordDto = new RecordDto();
-                    BeanUtils.copyProperties(recordDao.selectById(dataId),recordDto);
-                    if (recordDto.getRecordSegs()==null){
-                        List<RecordSeg> recordSegList= new ArrayList<>();
-                        RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
-                        tidif =recordSeg.getTidifValue();
-                        recordSegList.add(recordSeg);
-                        recordDto.setRecordSegs(recordSegList);
-                    }else {
-                        List<RecordSeg> recordSegs = recordDto.getRecordSegs();
-                        RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
-                        tidif =recordSeg.getTidifValue();
-                        recordSegs.add(recordSeg);
-                        recordDto.setRecordSegs(recordSegs);
-                    }
-                    Double weight = recordDto.getWeight() + tidif;
-                    recordDto.setWeight(weight);
-                    recordDtoList.add(recordDto);
-                }
-            }
-        }
 
         //选择排序  忘了springboot里咋排序了 先凑合用
         for (int i = 0; i < recordDtoList.size()-1; i++) {
@@ -159,25 +121,7 @@ public class RecordController {
      */
     @PostMapping("/add")
     public boolean add(Record record){
-        //文本信息加入data表
-        recordDao.insertRecord(record);
-        //分词处理
-        String sentence = record.getCaption();
-        List<SegToken> segTokens = segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
-        List<Keyword> list=tfidfAnalyzer.analyze(sentence,5);
-        Long recordId = record.getId();
-        Double tidifValue = new Double(0);
-        for (SegToken segToken : segTokens) {
-            //对应tidif值
-            for (Keyword keyword : list) {
-                if (keyword.getName()==segToken.word){
-                    tidifValue = keyword.getTfidfvalue();
-                }
-            }
-            //分词信息加入分词表
-            segmentationService.addSeg(segToken.word,recordId,tidifValue);
-        }
-        return true;
+        return recordService.addRecord(record);
     }
 
     /**
