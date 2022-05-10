@@ -73,8 +73,9 @@ public class RecordServiceImpl implements RecordService {
                 List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
 
                 for (Long dataId : RecordsIdList) {
-                    RecordDto recordDto = new RecordDto();
+
                     if (!recordIds.contains(dataId)){
+                        RecordDto recordDto = new RecordDto();
                         recordIds.add(dataId);
                         //对于每个record对象 查询该分词对应的tidif加入recordDto
 
@@ -85,21 +86,26 @@ public class RecordServiceImpl implements RecordService {
                         tidif =recordSeg.getTidifValue();
                         recordSegList.add(recordSeg);
                         recordDto.setRecordSegs(recordSegList);
+                        Double weight = recordDto.getWeight() + tidif;
+                        recordDto.setWeight(weight);
+                        recordDtoList.add(recordDto);
                     }else {
                         //找出对应的recordDto
                         for (RecordDto dto : recordDtoList) {
-                            if (dto.getId().equals(dataId)) recordDto = dto;
+                            if (dto.getId().equals(dataId)) {
+                                List<RecordSeg> recordSegs = dto.getRecordSegs();
+                                RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
+                                tidif =recordSeg.getTidifValue();
+                                recordSegs.add(recordSeg);
+                                dto.setRecordSegs(recordSegs);
+                                Double weight = dto.getWeight() + tidif;
+                                dto.setWeight(weight);
+                            }
                         }
-                        List<RecordSeg> recordSegs = recordDto.getRecordSegs();
-                        RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
-                        tidif =recordSeg.getTidifValue();
-                        recordSegs.add(recordSeg);
-                        recordDto.setRecordSegs(recordSegs);
+
 
                     }
-                    Double weight = recordDto.getWeight() + tidif;
-                    recordDto.setWeight(weight);
-                    recordDtoList.add(recordDto);
+
                 }
             }
         }
