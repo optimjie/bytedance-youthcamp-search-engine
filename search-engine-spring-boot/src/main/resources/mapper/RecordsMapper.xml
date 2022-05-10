@@ -13,8 +13,8 @@
         select * from data
     </select>
 
-    <select id="selectById" resultType="com.searchengine.entity.Record" parameterType="long">
-        SELECT * FROM data where id=#{id}
+    <select id="selectById" resultType="com.searchengine.entity.Record">
+        SELECT * FROM data_tab_#{selTable} where id=#{id}
     </select>
 
     <select id="selectRecordsByWord" resultType="com.searchengine.entity.Record">

@@ -13,7 +13,7 @@ public interface RecordDao {
 
     List<Record> selectRecordsByWord(String word);
 
-    Record selectById(@Param("id") Long id);
+    Record selectById(@Param("id") Long id, @Param("selTable")int selTable);
 
     int insertRecord(Record record);
 }

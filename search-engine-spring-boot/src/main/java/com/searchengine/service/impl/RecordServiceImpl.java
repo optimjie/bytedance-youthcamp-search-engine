@@ -111,8 +111,8 @@ public class RecordServiceImpl implements RecordService {
                         RecordDto recordDto = new RecordDto();
                         recordIds.add(dataId);
                         //对于每个record对象 查询该分词对应的tidif加入recordDto
-
-                        BeanUtils.copyProperties(recordDao.selectById(dataId),recordDto);
+                        //分表查询
+                        BeanUtils.copyProperties(recordDao.selectById(dataId, (int) (dataId % 2)),recordDto);
 
                         List<RecordSeg> recordSegList= new ArrayList<>();
                         RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());

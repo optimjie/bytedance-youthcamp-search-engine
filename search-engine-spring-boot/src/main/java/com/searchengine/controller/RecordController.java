@@ -20,10 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -31,8 +28,6 @@ public class RecordController {
 
     @Autowired
     private RecordService recordService;
-
-
 
     @Autowired
     private SegmentationService segmentationService;
