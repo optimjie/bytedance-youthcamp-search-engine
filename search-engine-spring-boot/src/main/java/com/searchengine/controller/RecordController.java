@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -39,6 +40,7 @@ public class RecordController {
     @Autowired
     private RecordSegService recordSegService;
 
+    private final int pageSize = 15;
 
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
@@ -90,7 +92,7 @@ public class RecordController {
      * @return
      */
     @GetMapping("/search")
-    public List<RecordDto> search(@RequestParam("word") String searchInfo){
+    public List<RecordDto> search(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum){
         //调用jieba分词进行分词
         log.info(searchInfo);
         List<RecordDto> recordDtoList = recordService.search(searchInfo);
