@@ -2,11 +2,13 @@ package com.searchengine.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 分词实体类
  */
 @Data
 public class Segmentation {
-    private Long id;
+    private int id;
     private String word;
 }

@@ -1,5 +1,6 @@
 package com.searchengine.service;
 
+import com.searchengine.common.SegResult;
 import com.searchengine.entity.Segmentation;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,15 @@ public interface SegmentationService {
 
     List<Segmentation> queryAllSeg();
 
-    Boolean addSeg(String word,Long recordId,Double tidifValue);
+    Boolean addSeg(String word,Integer recordId,Double tidifValue);
+
+    Boolean addSeg(String word,Integer recordId);
+
+    /*
+    之前的addSeg方法每个分词都要查询一遍分词表
+    新方法传入一个SegResult对象列表，遍历一次分词库表得到所有分词信息
+     */
+    Boolean addSeg(List<SegResult> segResults);
 
 
 }

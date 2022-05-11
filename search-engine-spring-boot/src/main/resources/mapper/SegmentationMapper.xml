@@ -5,7 +5,7 @@
 <!--绑定一个对应的Dao/Map接口-->
 <mapper namespace="com.searchengine.dao.SegmentationDao">
     <resultMap id="segmentationMap" type="com.searchengine.entity.Segmentation">
-        <id column="segid" property="id"></id>
+        <id column="id" property="id"></id>
         <result column="word" property="word"></result>
 
 <!--        <association property="record" javaType="com.searchengine.entity.Record">-->
@@ -36,6 +36,8 @@
         insert into segmentation (word)
         values (#{word})
     </insert>
+
+
 
 
 </mapper>

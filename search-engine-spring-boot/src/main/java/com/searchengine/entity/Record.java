@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Record {
 
-    private Long id;
+    private Integer id;
 
     private String url;
 

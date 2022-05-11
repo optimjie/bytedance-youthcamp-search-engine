@@ -2,6 +2,7 @@ package com.searchengine.springboot.segmentation;
 
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
+import com.searchengine.common.SegResult;
 import com.searchengine.dao.RecordDao;
 import com.searchengine.dao.RecordSegDao;
 import com.searchengine.dao.SegmentationDao;
@@ -16,7 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 扫描data表把所有内容分词并加入分词库
@@ -53,17 +57,47 @@ public class addAllSeg {
 //        }
         List<Record> records = recordService.queryAllRecord();
 
-        for (int i = 40998;i<=50258;i++) {
+        for (int i = 50001;i<=70000;i++) {
+            /*
+            对于每个文本信息
+            1.进行分词 得到分词表segtokens 和分词+tidif表keywords ——> List<SegResult> 传给addSeg方法
+
+             */
+            List<SegResult> segResults = new ArrayList<>();
+            Set<String> words = new HashSet<>();
             Record record = records.get(i);
             String sentence = record.getCaption();
             List<SegToken> segTokens = jiebaSegmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
-
-            Long recordId = record.getId();
+            List<Keyword> keywords=tfidfAnalyzer.analyze(record.getCaption(),5);
             for (SegToken segToken : segTokens) {
+                String word = segToken.word;
+                if (!words.contains(word)){
+                    words.add(word);
+                    SegResult segResult = new SegResult();
+                    segResult.setWord(word);
+                    segResult.setRecordId(i);
+                    segResult.setCount(1);
+                    segResults.add(segResult);
+                    for (Keyword keyword : keywords) {
+                        if (keyword.getName().equals(word)){
+                            segResult.setTidifValue(keyword.getTfidfvalue());
+                        }
+                    }
+                }else {
+                    for (SegResult segResult : segResults) {
+                        if (segResult.getWord().equals(word)){
+                            int count = segResult.getCount();
+                            segResult.setCount(++count);
+                        }
+                    }
+                }
+            }
 
-                segmentationService.addSeg(segToken.word,recordId,null);
+
+            //把列表存入seg表
+            segmentationService.addSeg(segResults);
         }
-        }
+
     }
 
 //    /**
@@ -107,29 +141,28 @@ public class addAllSeg {
 //
 //    }
 
-    @Test
-    public void addTIDIF(){
-
-        //查询每个dataId对应分词的tidif值
-        for (int i = 39357; i <= 50258; i++) {
-            Long l = new Long(i);
-            //分表查询
-            Record record = recordDao.selectById(l, (int) (l % 2));
-            List<Keyword> list=tfidfAnalyzer.analyze(record.getCaption(),5);
-            for(Keyword word:list){
-                //对于每个seg和对应的值 存入recordSeg表
-                Segmentation seg = segmentationDao.selectOneSeg(word.getName());
-
-                if (seg !=null ) {
-                    Long segId = seg.getId();
-                    RecordSeg recordSeg = new RecordSeg();
-                    recordSeg.setDataId(l);
-                    recordSeg.setSegId(segId);
-                    recordSeg.setTidifValue(word.getTfidfvalue());
-                    recordSegDao.updateRecordSeg(recordSeg);
-                }
-            }
-        }
-
-    }
+//    @Test
+//    public void addTIDIF(){
+//
+//        //查询每个dataId对应分词的tidif值
+//        for (int i = 39357; i <= 50258; i++) {
+//            //分表查询
+//            Record record = recordDao.selectById(i);
+//            List<Keyword> list=tfidfAnalyzer.analyze(record.getCaption(),5);
+//            for(Keyword word:list){
+//                //对于每个seg和对应的值 存入recordSeg表
+//                Segmentation seg = segmentationDao.selectOneSeg(word.getName());
+//
+//                if (seg !=null ) {
+//                    Integer segId = seg.getId();
+//                    RecordSeg recordSeg = new RecordSeg();
+//                    recordSeg.setDataId(i);
+//                    recordSeg.setSegId(segId);
+//                    recordSeg.setTidifValue(word.getTfidfvalue());
+//                    recordSegDao.updateRecordSeg(recordSeg);
+//                }
+//            }
+//        }
+//
+//    }
 }

@@ -2,9 +2,13 @@ package com.searchengine.springboot.segmentation;
 
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
+import com.searchengine.dao.SegmentationDao;
+import com.searchengine.entity.Segmentation;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -12,8 +16,11 @@ import java.util.Locale;
 
 
 @SpringBootTest
+@Slf4j
 public class test {
 
+    @Autowired
+    private SegmentationDao segmentationDao;
     private JiebaSegmenter segmenter = new JiebaSegmenter();
 
     String[] sentences =
@@ -49,5 +56,11 @@ public class test {
         for (String sentence : sentences) {
             System.out.println(segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX).toString());
         }
+    }
+
+    @Test
+    public void testReturn1(){
+        int s = segmentationDao.insertSeg("牛逼");
+        log.info("id:{}",s);
     }
 }

@@ -11,6 +11,6 @@ public interface SegmentationDao {
     List<Segmentation> selectAllSeg();
     //加入新分词
     int insertSeg(String word);
-    //查询单个分词
+    //查询单个分词对应的id
     Segmentation selectOneSeg(String word);
 }

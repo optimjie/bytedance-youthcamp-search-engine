@@ -68,7 +68,7 @@ public class RecordServiceImpl implements RecordService {
     public List<RecordDto> search(String searchInfo) {
 
         // ======检查是否需要过滤======start
-        Set<Long> set = new HashSet<>();
+        Set<Integer> set = new HashSet<>();
         List<SegToken> segTokensFilter = new ArrayList<>();
         String[] searchWords = searchInfo.split("\\s+");
         for (int i = searchWords.length - 1; i >= 1; i--) {
@@ -84,8 +84,8 @@ public class RecordServiceImpl implements RecordService {
         for (SegToken token : segTokensFilter) {
             Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
             if (oneSeg != null) {
-                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
-                for (Long v : RecordsIdList) {
+                List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
+                for (Integer v : RecordsIdList) {
                     set.add(v);
                 }
             }
@@ -98,7 +98,7 @@ public class RecordServiceImpl implements RecordService {
         searchInfo = temp;
         // ======检查是否需要过滤======end
 
-        Set<Long> recordIds = new HashSet<>();
+        Set<Integer> recordIds = new HashSet<>();
         List<SegToken> segTokens = segmenter.process(searchInfo, JiebaSegmenter.SegMode.SEARCH);
         List<RecordDto> recordDtoList = new ArrayList<>();
         for (SegToken token : segTokens) {
@@ -108,16 +108,16 @@ public class RecordServiceImpl implements RecordService {
             Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
             Double tidif = new Double(0);
             if (oneSeg!=null) {
-                List<Long> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
+                List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
 
-                for (Long dataId : RecordsIdList) {
+                for (Integer dataId : RecordsIdList) {
                     if (set.contains(dataId)) continue;  // 若包含需要过滤的词 continue
                     if (!recordIds.contains(dataId)){
                         RecordDto recordDto = new RecordDto();
                         recordIds.add(dataId);
                         //对于每个record对象 查询该分词对应的tidif加入recordDto
                         //分表查询
-                        BeanUtils.copyProperties(recordDao.selectById(dataId, (int) (dataId % 2)),recordDto);
+                        BeanUtils.copyProperties(recordDao.selectById(dataId),recordDto);
 
                         List<RecordSeg> recordSegList= new ArrayList<>();
                         RecordSeg recordSeg = recordSegDao.selectOneRecordSeg(dataId, oneSeg.getId());
@@ -158,7 +158,7 @@ public class RecordServiceImpl implements RecordService {
         String sentence = record.getCaption();
         List<SegToken> segTokens = segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX);
         List<Keyword> list=tfidfAnalyzer.analyze(sentence,5);
-        Long recordId = record.getId();
+        Integer recordId = record.getId();
         Double tidifValue = new Double(0);
         for (SegToken segToken : segTokens) {
             //对应tidif值
