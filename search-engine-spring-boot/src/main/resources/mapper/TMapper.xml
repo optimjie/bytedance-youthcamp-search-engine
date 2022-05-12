@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--绑定一个对应的Dao/Map接口-->
+<mapper namespace="com.searchengine.dao.TDao">
+    <insert id="insert1" parameterType="list">
+        insert into segmentation(word)
+        values
+        <foreach collection="segs" item="item" separator=",">
+            (#{item})
+        </foreach>
+
+    </insert>
+
+    <insert id="insert2" parameterType="list">
+        insert into data_seg_relation(data_id, seg_id, tidif_value, count)
+        values
+        <foreach collection="relations" item="item" separator=",">
+            (
+            #{item.dataId},
+            #{item.segId},
+            #{item.tidif},
+            #{item.count}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getMaxId" resultType="java.lang.Integer">
+        select max(id) from `data`
+    </select>
+</mapper>
