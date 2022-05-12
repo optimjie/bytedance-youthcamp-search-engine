@@ -8,9 +8,11 @@ import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.SegmentationService;
+import com.searchengine.utils.RedisUtil;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public class SegmentationServiceImpl implements SegmentationService {
 
     @Autowired
     private RecordSegService recordSegService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
 
@@ -79,19 +83,33 @@ public class SegmentationServiceImpl implements SegmentationService {
             recordSeg.setTidifValue(segResult.getTidifValue());
             recordSeg.setCount(segResult.getCount());
             String word = segResult.getWord();
-            Segmentation seg= segmentationDao.selectOneSeg(word);
-            if (seg==null){
-                //分词不存在 加入分词表
-                segmentationDao.insertSeg(segResult.getWord());//此处不知道怎么直接返回主键 试了几个方法都失败了
+            if (redisUtil.hasKey("seg_"+word)){
+                int segId = (int)redisUtil.get("seg_"+word);
+                recordSeg.setSegId(segId);
+                recordSegList.add(recordSeg);
+            }else {
 
-                seg = segmentationDao.selectOneSeg(word);//导致现在又多查了一次
+                Segmentation seg= segmentationDao.selectOneSeg(word);
+                if (seg==null){
+                    //分词不存在 加入分词表
+                    segmentationDao.insertSeg(segResult.getWord());//此处不知道怎么直接返回主键 试了几个方法都失败了
+
+                    seg = segmentationDao.selectOneSeg(word);//导致现在又多查了一次
+                }
+                int segId = seg.getId();
+                recordSeg.setSegId(segId);
+                recordSegList.add(recordSeg);
+
+                Thread thread=new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        redisUtil.set("seg_"+word, segId, 1800);
+                    }
+                });
+                thread.start();
+
             }
-            recordSeg.setSegId(seg.getId());
-            recordSegList.add(recordSeg);
         }
-
-
-
         return recordSegService.addBatch(recordSegList) > 0;
     }
 

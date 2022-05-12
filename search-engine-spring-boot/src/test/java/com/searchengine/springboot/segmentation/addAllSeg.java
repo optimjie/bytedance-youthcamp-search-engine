@@ -57,12 +57,13 @@ public class addAllSeg {
 //        }
         List<Record> records = recordService.queryAllRecord();
 
-        for (int i = 50001;i<=70000;i++) {
+        for (int i = 0;i<=10000;i++) {
             /*
             对于每个文本信息
             1.进行分词 得到分词表segtokens 和分词+tidif表keywords ——> List<SegResult> 传给addSeg方法
 
              */
+            int dataId = i+1;
             List<SegResult> segResults = new ArrayList<>();
             Set<String> words = new HashSet<>();
             Record record = records.get(i);
@@ -75,7 +76,7 @@ public class addAllSeg {
                     words.add(word);
                     SegResult segResult = new SegResult();
                     segResult.setWord(word);
-                    segResult.setRecordId(i);
+                    segResult.setRecordId(dataId);
                     segResult.setCount(1);
                     segResults.add(segResult);
                     for (Keyword keyword : keywords) {
