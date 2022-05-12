@@ -114,7 +114,7 @@ public class addAllSeg {
         for (int i = 39357; i <= 50258; i++) {
             Long l = new Long(i);
             //分表查询
-            Record record = recordDao.selectById(l, (int) (l % 2));
+            Record record = recordDao.selectById(l);
             List<Keyword> list=tfidfAnalyzer.analyze(record.getCaption(),5);
             for(Keyword word:list){
                 //对于每个seg和对应的值 存入recordSeg表
