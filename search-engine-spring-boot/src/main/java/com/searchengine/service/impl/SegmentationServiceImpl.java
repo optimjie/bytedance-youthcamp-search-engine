@@ -103,7 +103,7 @@ public class SegmentationServiceImpl implements SegmentationService {
                 Thread thread=new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        redisUtil.set("seg_"+word, segId, 1800);
+                        redisUtil.set("seg_"+word, segId);
                     }
                 });
                 thread.start();

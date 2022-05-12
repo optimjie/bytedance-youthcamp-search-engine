@@ -31,7 +31,12 @@ public class test {
     @Test
     public void segTest1(){
         for (String sentence : sentences) {
+            long start = System.currentTimeMillis();
             List<SegToken> tokens = segmenter.process(sentence, JiebaSegmenter.SegMode.SEARCH);
+            TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
+            List<Keyword> list=tfidfAnalyzer.analyze(sentence,10);
+            long end = System.currentTimeMillis();
+            System.out.println((end - start) + "ms");
             System.out.print(String.format(Locale.getDefault(), "\n%s\n%s", sentence, tokens.toString()));
             for (SegToken token : tokens) {
                 System.out.println(token.word);

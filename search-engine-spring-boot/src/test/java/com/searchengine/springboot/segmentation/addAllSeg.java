@@ -57,7 +57,7 @@ public class addAllSeg {
 //        }
         List<Record> records = recordService.queryAllRecord();
 
-        for (int i = 0;i<=10000;i++) {
+        for (int i = 96454;i<=190000;i++) {
             /*
             对于每个文本信息
             1.进行分词 得到分词表segtokens 和分词+tidif表keywords ——> List<SegResult> 传给addSeg方法
