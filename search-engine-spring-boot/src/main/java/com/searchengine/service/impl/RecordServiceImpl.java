@@ -12,6 +12,8 @@ import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
+import com.searchengine.utils.RedisUtil_db0;
+import com.searchengine.utils.RedisUtil_db1;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +45,8 @@ public class RecordServiceImpl implements RecordService {
     @Autowired
     private RecordSegService recordSegService;
 
-
+    @Autowired
+    private RedisUtil_db0 redisUtil;
 
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
@@ -82,7 +85,10 @@ public class RecordServiceImpl implements RecordService {
             }
         }
         for (SegToken token : segTokensFilter) {
-            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            //Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            //在redis中搜索Segmentation
+            int id =  Integer.parseInt(String.valueOf(redisUtil.get("seg_" + token.word)));
+            Segmentation oneSeg = segmentationDao.selectOneById(id);
             if (oneSeg != null) {
                 List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
                 for (Integer v : RecordsIdList) {
@@ -105,7 +111,9 @@ public class RecordServiceImpl implements RecordService {
 
             //查出每个分词对应的caption
             log.info("分词为{}",token.word);
-            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+//            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
+            int id =  Integer.parseInt(String.valueOf(redisUtil.get("seg_" + token.word)));
+            Segmentation oneSeg = segmentationDao.selectOneById(id);
             Double tidif = new Double(0);
             if (oneSeg!=null) {
                 List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID

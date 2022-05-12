@@ -1,6 +1,5 @@
 package com.searchengine.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.searchengine.common.SegResult;
 import com.searchengine.dao.RecordSegDao;
 import com.searchengine.dao.SegmentationDao;
@@ -8,11 +7,10 @@ import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.SegmentationService;
-import com.searchengine.utils.RedisUtil;
-import com.searchengine.utils.jieba.keyword.Keyword;
+import com.searchengine.utils.RedisUtil_db0;
+import com.searchengine.utils.RedisUtil_db1;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ public class SegmentationServiceImpl implements SegmentationService {
     @Autowired
     private RecordSegService recordSegService;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisUtil_db0 redisUtil;
 
     TFIDFAnalyzer tfidfAnalyzer=new TFIDFAnalyzer();
 

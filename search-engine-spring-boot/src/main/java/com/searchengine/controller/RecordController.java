@@ -1,29 +1,21 @@
 package com.searchengine.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.huaban.analysis.jieba.JiebaSegmenter;
-import com.huaban.analysis.jieba.SegToken;
-import com.searchengine.dao.RecordDao;
-import com.searchengine.dao.RecordSegDao;
-import com.searchengine.dao.SegmentationDao;
 import com.searchengine.dto.RecordDto;
 import com.searchengine.entity.Record;
-import com.searchengine.entity.RecordSeg;
-import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
-import com.searchengine.utils.RedisUtil;
-import com.searchengine.utils.jieba.keyword.Keyword;
+import com.searchengine.utils.RedisUtil_db1;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -40,7 +32,7 @@ public class RecordController {
     private RecordSegService recordSegService;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisUtil_db1 redisUtilDb1;
 
     private final int pageSize = 15;
 
@@ -98,8 +90,9 @@ public class RecordController {
     @GetMapping("/search_redis")
     public List<RecordDto> search_redis(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum, HttpServletRequest request,HttpServletResponse response) throws Exception {
         List<RecordDto> recordDtoList = null;
-        if (redisUtil.hasKey(searchInfo)) {
-            recordDtoList = (List<RecordDto>) redisUtil.get(searchInfo);
+        if (redisUtilDb1.hasKey(searchInfo)) {
+//            recordDtoList = (List<RecordDto>) redisUtilDb1.get(searchInfo);
+            recordDtoList  = JSONObject.parseObject((String) redisUtilDb1.get(searchInfo), new TypeReference<List<RecordDto>>(){});
         } else {
             //不能用重发请求，太慢了;重定向的word参数总是传不过去
             //request.getRequestDispatcher("/search?word=" + searchInfo + "&pageNum=" + pageNum).forward(request,response);
@@ -118,7 +111,8 @@ public class RecordController {
             Thread thread=new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    redisUtil.set(searchInfo, finalRecordDtoList, 1800);
+                    String sList = JSONObject.toJSONString(finalRecordDtoList);
+                    redisUtilDb1.set(searchInfo, sList, 1800);
                 }
             });
             thread.start();

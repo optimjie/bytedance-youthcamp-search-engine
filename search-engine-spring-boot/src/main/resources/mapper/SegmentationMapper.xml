@@ -28,6 +28,10 @@
         select * from segmentation
     </select>
 
+    <select id="selectOneById" resultType="com.searchengine.entity.Segmentation">
+        select * from segmentation where id = #{id}
+    </select>
+
     <select id="selectOneSeg" resultType="com.searchengine.entity.Segmentation" parameterType="java.lang.String">
         SELECT * FROM segmentation WHERE word=#{word}
     </select>

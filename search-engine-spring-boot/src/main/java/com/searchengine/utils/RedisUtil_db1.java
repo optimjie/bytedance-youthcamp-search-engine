@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class RedisUtil {
+public class RedisUtil_db1 {
 
     @Autowired
-    @Qualifier("myRedisTemplate")
+    @Qualifier("redisTemplate1")
     private RedisTemplate redisTemplate;
 
     // =============================common============================
