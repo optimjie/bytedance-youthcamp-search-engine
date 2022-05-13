@@ -87,8 +87,12 @@ public class RecordServiceImpl implements RecordService {
         for (SegToken token : segTokensFilter) {
             //Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
             //在redis中搜索Segmentation
-            int id =  Integer.parseInt(String.valueOf(redisUtil.get("seg_" + token.word)));
-            Segmentation oneSeg = segmentationDao.selectOneById(id);
+            String s = String.valueOf(redisUtil.get("seg_" + token.word));
+            Segmentation oneSeg = null;
+            if(!s.equals(null) && !s.equals("null")){
+                int id =  Integer.parseInt(s);
+                oneSeg = segmentationDao.selectOneById(id);
+            }
             if (oneSeg != null) {
                 List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);  // 包含过滤词分词的所有recordID
                 for (Integer v : RecordsIdList) {
@@ -112,8 +116,12 @@ public class RecordServiceImpl implements RecordService {
             //查出每个分词对应的caption
             log.info("分词为{}",token.word);
 //            Segmentation oneSeg = segmentationDao.selectOneSeg(token.word);
-            int id =  Integer.parseInt(String.valueOf(redisUtil.get("seg_" + token.word)));
-            Segmentation oneSeg = segmentationDao.selectOneById(id);
+            String s = String.valueOf(redisUtil.get("seg_" + token.word));
+            Segmentation oneSeg = null;
+            if (!s.equals(null) && !s.equals("null")) {
+                int id = Integer.parseInt(s);
+                oneSeg = segmentationDao.selectOneById(id);
+            }
             Double tidif = new Double(0);
             if (oneSeg!=null) {
                 List<Integer> RecordsIdList = recordSegService.queryRecordBySeg(oneSeg);//包含该分词的所有recordID
