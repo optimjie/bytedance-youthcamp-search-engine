@@ -17,11 +17,20 @@ public class RecordSegServiceImpl implements RecordSegService {
     private RecordSegDao recordSegDao;
 
     @Override
-    public List<Long> queryRecordBySeg(Segmentation segmentation) {
-        List<Long> recordIdlist= new ArrayList<>();
+    public List<Integer> queryRecordBySeg(Segmentation segmentation) {
+        List<Integer> recordIdlist= new ArrayList<>();
         for (RecordSeg recordSeg : recordSegDao.selectRecordBySeg(segmentation.getId())) {
             recordIdlist.add(recordSeg.getDataId());
         }
         return recordIdlist;
+    }
+
+    @Override
+    public int addBatch(List<RecordSeg> recordSegList) {
+        int count = 0;
+        for (RecordSeg recordSeg : recordSegList) {
+            count+=recordSegDao.insertRecordSeg(recordSeg);
+        }
+        return count;
     }
 }

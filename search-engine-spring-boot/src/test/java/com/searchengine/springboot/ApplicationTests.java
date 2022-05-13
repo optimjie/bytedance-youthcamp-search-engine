@@ -1,15 +1,10 @@
 package com.searchengine.springboot;
 
 import com.searchengine.dao.RecordSegDao;
-import com.searchengine.entity.Record;
-import com.searchengine.entity.RecordSeg;
-import com.searchengine.utils.RedisUtil;
+import com.searchengine.utils.RedisUtil_db1;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 class ApplicationTests {
@@ -18,22 +13,22 @@ class ApplicationTests {
     private RecordSegDao recordSegDao;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisUtil_db1 redisUtilDb1;
 
     @Test
     void contextLoads() {
-        RecordSeg recordSeg = new RecordSeg();
-        Long l = new Long(1);
-        recordSeg.setDataId(l);
-        recordSeg.setSegId(l);
-        recordSeg.setCount(2);
-        recordSegDao.updateRecordSeg(recordSeg);
+//        RecordSeg recordSeg = new RecordSeg();
+//        Long l = new Long(1);
+//        recordSeg.setDataId(l);
+//        recordSeg.setSegId(l);
+//        recordSeg.setCount(2);
+//        recordSegDao.updateRecordSeg(recordSeg);
 
     }
 
     @Test
     void testRedis(){
-        redisUtil.set("name", "joker");
+        redisUtilDb1.set("name", "joker");
     }
 
 }
