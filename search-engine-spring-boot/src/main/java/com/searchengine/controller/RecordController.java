@@ -1,5 +1,7 @@
 package com.searchengine.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
@@ -72,7 +74,7 @@ public class RecordController {
     public List<RecordDto> search_redis(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum, HttpServletRequest request,HttpServletResponse response) throws Exception {
         List<RecordDto> recordDtoList = null;
         if (redisUtil.hasKey(searchInfo)) {
-            recordDtoList = (List<RecordDto>) redisUtil.get(searchInfo);
+            recordDtoList  = JSONObject.parseObject((String) redisUtil.get(searchInfo), new TypeReference<List<RecordDto>>(){});
         } else {
             //不能用重发请求，太慢了;重定向的word参数总是传不过去
             //request.getRequestDispatcher("/search?word=" + searchInfo + "&pageNum=" + pageNum).forward(request,response);
@@ -91,7 +93,8 @@ public class RecordController {
             Thread thread=new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    redisUtil.set(searchInfo, finalRecordDtoList, 1800);
+                    String sList = JSONObject.toJSONString(finalRecordDtoList);
+                    redisUtil.set(searchInfo, sList, 1800);
                 }
             });
             thread.start();
