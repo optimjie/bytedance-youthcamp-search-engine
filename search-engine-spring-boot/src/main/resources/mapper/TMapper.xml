@@ -27,6 +27,6 @@
     </insert>
 
     <select id="getMaxId" resultType="java.lang.Integer">
-        select max(id) from segmentation
+        select ifnull(max(id), 0) from segmentation
     </select>
 </mapper>
