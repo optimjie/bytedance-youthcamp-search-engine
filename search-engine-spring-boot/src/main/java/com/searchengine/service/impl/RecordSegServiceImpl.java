@@ -3,6 +3,7 @@ package com.searchengine.service.impl;
 import com.searchengine.dao.RecordSegDao;
 import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
+import com.searchengine.entity.T;
 import com.searchengine.service.RecordSegService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,10 @@ public class RecordSegServiceImpl implements RecordSegService {
     }
 
     @Override
-    public int addBatch(List<RecordSeg> recordSegList) {
-        int count = 0;
-        for (RecordSeg recordSeg : recordSegList) {
-            count+=recordSegDao.insertRecordSeg(recordSeg);
-        }
-        return count;
+    public boolean addBatch(List<RecordSeg> relations) {
+        recordSegDao.insertBatch(relations);
+        return true;
     }
+
+
 }

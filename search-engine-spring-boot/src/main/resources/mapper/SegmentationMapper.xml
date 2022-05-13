@@ -41,6 +41,19 @@
         values (#{word})
     </insert>
 
+    <select id="getMaxId" resultType="java.lang.Integer">
+        select ifnull(max(id), 0) from segmentation
+    </select>
+
+    <insert id="insertBatchSeg" parameterType="list">
+        insert into segmentation(word)
+        values
+        <foreach collection="segs" item="item" separator=",">
+            (#{item})
+        </foreach>
+
+    </insert>
+
 
 
 

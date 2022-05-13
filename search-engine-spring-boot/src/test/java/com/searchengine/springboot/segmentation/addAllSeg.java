@@ -63,16 +63,16 @@ public class addAllSeg {
         }
 
         List<String> segs = new ArrayList<>(10000);
-        List<T> relations = new ArrayList<>(10000);
+        List<RecordSeg> relations = new ArrayList<>(10000);
 
-        int segMaxId = tDao.getMaxId();  // 获取seg表中最大的id
+        int segMaxId = segmentationDao.getMaxId();  // 获取seg表中最大的id
 
         for (int i = 0; i < 10000; i++) {  // 10000 15s
             Record record = records.get(i);
             String caption = record.getCaption();
             List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
             List<Keyword> keywords = tfidfAnalyzer.analyze(caption,5);
-            Map<String,T> countMap = new HashMap<>();
+            Map<String,RecordSeg> countMap = new HashMap<>();
             for (SegToken segToken : segTokens) {
                 String word = segToken.word;
                 int segId = 0;
@@ -111,22 +111,22 @@ public class addAllSeg {
                 //--------------计数--------------
                 if (!countMap.containsKey(word)){
                     int count = 1;
-                    countMap.put(word,new T(dataId, segId, tf, count));
+                    countMap.put(word,new RecordSeg(dataId, segId, tf, count));
                 }else {
-                    T t = countMap.get(word);
+                    RecordSeg t = countMap.get(word);
                     int count = t.getCount();
                     t.setCount(++count);
                     countMap.put(word,t);
                 }
                 //--------------------------------
             }
-            for (T t : countMap.values()) {
+            for (RecordSeg t : countMap.values()) {
                 relations.add(t);
             }
         }
 
-        tDao.insert1(segs);
-        tDao.insert2(relations);
+        segmentationDao.insertBatchSeg(segs);
+        recordSegDao.insertBatch(relations);
 
     }
 

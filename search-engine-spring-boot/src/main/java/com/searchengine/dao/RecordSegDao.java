@@ -2,6 +2,7 @@ package com.searchengine.dao;
 
 import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
+import com.searchengine.entity.T;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +20,7 @@ public interface RecordSegDao {
     int insertRecordSeg(RecordSeg recordSeg);
     //更新关系表
     int updateRecordSeg(RecordSeg recordSeg);
+    //批量插入关系表
+    boolean insertBatch(@Param("relations")List<RecordSeg> relations);
 
 }

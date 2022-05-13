@@ -16,4 +16,8 @@ public interface SegmentationDao {
     Segmentation selectOneSeg(String word);
     //根据id查询
     Segmentation selectOneById(@Param("id") int id);
+    //查询最大id
+    int getMaxId();
+    //批量插入分词
+    boolean insertBatchSeg(@org.apache.ibatis.annotations.Param("segs")List<String> segs);
 }

@@ -86,5 +86,17 @@
         where data_id = #{dataId} AND seg_id = #{segId}
     </update>
 
+    <insert id="insertBatch" parameterType="list">
+        insert into data_seg_relation(data_id, seg_id, tidif_value, count)
+        values
+        <foreach collection="relations" item="item" separator=",">
+            (
+            #{item.dataId},
+            #{item.segId},
+            #{item.tidifValue},
+            #{item.count}
+            )
+        </foreach>
+    </insert>
 
 </mapper>

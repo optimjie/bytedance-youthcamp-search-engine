@@ -21,5 +21,7 @@ public interface SegmentationService {
      */
     Boolean addSeg(List<SegResult> segResults);
 
+    int getMaxId();
+    boolean insertBatchSeg(List<String> segs);
 
 }

@@ -108,7 +108,18 @@ public class SegmentationServiceImpl implements SegmentationService {
 
             }
         }
-        return recordSegService.addBatch(recordSegList) > 0;
+        return recordSegService.addBatch(recordSegList);
+    }
+
+    @Override
+    public int getMaxId() {
+        return segmentationDao.getMaxId();
+    }
+
+    @Override
+    public boolean insertBatchSeg(List<String> segs) {
+        segmentationDao.insertBatchSeg(segs);
+        return true;
     }
 
     @Override
