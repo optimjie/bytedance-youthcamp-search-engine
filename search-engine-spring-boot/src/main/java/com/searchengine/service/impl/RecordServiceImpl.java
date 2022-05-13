@@ -119,7 +119,7 @@ public class RecordServiceImpl implements RecordService {
             String s = String.valueOf(redisUtil.get("seg_" + token.word));
             Segmentation oneSeg = null;
             if (!s.equals(null) && !s.equals("null")) {
-                int id = Integer.parseInt(s);
+                int id = Integer.parseInt(s)+1;
                 oneSeg = segmentationDao.selectOneById(id);
             }
             Double tidif = new Double(0);

@@ -11,4 +11,4 @@ spring:
       max-idle: 3
       min-idle: 0
       max-wait: -1
-    password: 123456
+    password: null
