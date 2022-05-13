@@ -24,8 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -73,9 +72,9 @@ public class addAllSeg {
             String caption = record.getCaption();
             List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
             List<Keyword> keywords = tfidfAnalyzer.analyze(caption,5);
+            Map<String,T> countMap = new HashMap<>();
             for (SegToken segToken : segTokens) {
                 String word = segToken.word;
-
                 int segId = 0;
                 boolean exist = false;
                 if (!bf.mightContain(word)) {  // 不存在是一定不存在
@@ -109,8 +108,20 @@ public class addAllSeg {
                         break;
                     }
                 }
-                T relation = new T(dataId, segId, tf, 1);
-                relations.add(relation);
+                //--------------计数--------------
+                if (!countMap.containsKey(word)){
+                    int count = 1;
+                    countMap.put(word,new T(dataId, segId, tf, count));
+                }else {
+                    T t = countMap.get(word);
+                    int count = t.getCount();
+                    t.setCount(++count);
+                    countMap.put(word,t);
+                }
+                //--------------------------------
+            }
+            for (T t : countMap.values()) {
+                relations.add(t);
             }
         }
 
