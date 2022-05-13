@@ -2,7 +2,6 @@
   <el-container>
     <el-header height="20%">
       <img src="~@/assets/1057inRes.png" alt="">
-      &nbsp;&nbsp;
       <el-input v-model="search_word" placeholder="请输入搜索内容" prefix-icon="el-icon-search">
         <el-button style="margin-right:10px" slot="suffix" type="text" @click="search">搜索</el-button>
       </el-input>
