@@ -30,6 +30,8 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -41,7 +43,10 @@ export default {
       // 需要请求数据来显示
       this.$router.push({
         path: '/search',
-        query: { word : this.search_word }
+        query: {
+          word : this.search_word,
+          recordsNum: this.recordsNum
+        }
       });
     }
   }

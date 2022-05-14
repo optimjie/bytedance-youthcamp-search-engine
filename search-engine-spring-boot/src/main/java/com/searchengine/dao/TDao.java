@@ -13,4 +13,5 @@ public interface TDao {
     boolean insert2(@Param("relations")List<T> relations);
     int getMaxId();
     List<Record> getRecord(@Param("segIds")String segIds, @Param("pageSize")int pageSize, @Param("offset")int offset);
+    int getRecordsNum(@Param("segIds")String segIds);
 }

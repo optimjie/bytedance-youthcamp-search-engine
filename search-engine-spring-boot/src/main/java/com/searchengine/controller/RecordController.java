@@ -136,8 +136,8 @@ public class RecordController {
     }
 
     @GetMapping("/search_test")
-    public List<com.searchengine.dto.Record> search_test(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum) {
-        return tService.getRord(searchInfo, pageSize, pageNum);
+    public Map<String, Object> search_test(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum) {
+        return tService.getRcord(searchInfo, pageSize, pageNum);
     }
 
     /**

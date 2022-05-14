@@ -36,8 +36,13 @@
                 select data_id from data_seg_relation
                 where seg_id in(${segIds})
                 group by data_id
-                order by sum(tidif_value) desc limit #{pageSize} offset ${offset}
+                order by sum(tidif_value) desc limit ${pageSize} offset ${offset}
             ) as t
         )
+    </select>
+    
+    <select id="getRecordsNum" resultType="java.lang.Integer">
+        select count(distinct data_id) from data_seg_relation
+		    where seg_id in(${segIds})
     </select>
 </mapper>
