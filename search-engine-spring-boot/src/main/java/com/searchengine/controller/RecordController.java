@@ -140,6 +140,11 @@ public class RecordController {
         return tService.getRord(searchInfo, pageSize, pageNum);
     }
 
+    @GetMapping("/related_word")
+    public List<String> relatedWord(@RequestParam("word") String searchInfo){
+        return segmentationService.getAllByWords(searchInfo);
+    }
+
     /**
      * 新增文本
      *

@@ -20,4 +20,6 @@ public interface SegmentationDao {
     int getMaxId();
     //批量插入分词
     boolean insertBatchSeg(@org.apache.ibatis.annotations.Param("segs")List<String> segs);
+
+    List<Segmentation> getAllByWords(String word);
 }

@@ -54,7 +54,9 @@
 
     </insert>
 
-
+    <select id="getAllByWords" resultType="com.searchengine.entity.Segmentation">
+        select * from segmentation where word LIKE #{word};
+    </select>
 
 
 </mapper>

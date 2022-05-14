@@ -2,6 +2,7 @@ package com.searchengine.service;
 
 import com.searchengine.common.SegResult;
 import com.searchengine.entity.Segmentation;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,4 +25,5 @@ public interface SegmentationService {
     int getMaxId();
     boolean insertBatchSeg(List<String> segs);
 
+    List<String> getAllByWords(@Param("word") String word);
 }
