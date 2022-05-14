@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TServiceImpl implements TService {
@@ -36,7 +38,7 @@ public class TServiceImpl implements TService {
     }
 
     @Override
-    public List<Record> getRord(String searchInfo, int pageSize, int pageNum) {
+    public Map<String, Object> getRcord(String searchInfo, int pageSize, int pageNum) {
         int offset = pageSize * (pageNum - 1);
         StringBuilder sb = new StringBuilder();
         JiebaSegmenter segmenter = new JiebaSegmenter();
@@ -48,6 +50,11 @@ public class TServiceImpl implements TService {
             if (first) { sb.append(segId); first = false; }
             else sb.append(',').append(segId);
         }
-        return tDao.getRecord(sb.toString(), pageSize, offset);
+        List<Record> records = tDao.getRecord(sb.toString(), pageSize, offset);
+        int recordsNum = tDao.getRecordsNum(sb.toString());
+        Map<String, Object> mp = new HashMap<>();
+        mp.put("recordsNum", recordsNum);
+        mp.put("records", records);
+        return mp;
     }
 }
