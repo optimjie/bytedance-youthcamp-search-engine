@@ -15,6 +15,7 @@ import com.searchengine.entity.Segmentation;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
+import com.searchengine.service.TService;
 import com.searchengine.utils.RedisUtil_db0;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
@@ -45,6 +46,9 @@ public class RecordController {
     private RedisUtil_db0 redisUtil;
 
     private final int pageSize = 15;
+
+    @Autowired
+    private TService tService;
 
 
     TFIDFAnalyzer tfidfAnalyzer = new TFIDFAnalyzer();
@@ -131,6 +135,11 @@ public class RecordController {
         return recordDtoList.subList(start, end);
     }
 
+    @GetMapping("/search_test")
+    public List<com.searchengine.dto.Record> search_test(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum) {
+        return tService.getRord(searchInfo, pageSize, pageNum);
+    }
+
     /**
      * 新增文本
      *
@@ -154,6 +163,5 @@ public class RecordController {
         log.info(word);
         return recordService.queryRecordByWord(word);
     }
-
 
 }

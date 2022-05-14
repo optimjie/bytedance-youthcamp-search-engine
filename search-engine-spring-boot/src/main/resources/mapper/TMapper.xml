@@ -29,4 +29,15 @@
     <select id="getMaxId" resultType="java.lang.Integer">
         select ifnull(max(id), 0) from segmentation
     </select>
+
+    <select id="getRecord" resultType="com.searchengine.dto.Record">
+        select url, caption from data where id in (
+            select t.data_id from (
+                select data_id from data_seg_relation
+                where seg_id in(${segIds})
+                group by data_id
+                order by sum(tidif_value) desc limit #{pageSize} offset ${offset}
+            ) as t
+        )
+    </select>
 </mapper>
