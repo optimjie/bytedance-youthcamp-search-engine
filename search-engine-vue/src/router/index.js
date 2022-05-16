@@ -5,10 +5,12 @@ Vue.use(Router)
 
 const Home = () => import('../components/HomePage')
 const SearchResult = () => import('../components/SearchResult')
+const Login = () => import('../components/Login')
 
 const routes = [
     { path: '/', component: Home },
     { path: '/search', component: SearchResult },
+    { path: '/login', component: Login },
     { path: '/*', redirect: '/' }  // 当匹配不上时重定向的到首页
 ]
 
