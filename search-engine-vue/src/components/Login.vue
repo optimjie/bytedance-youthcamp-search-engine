@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-form ref="form" :model="form" :rules="rules" class="login-box">
+    <el-form ref="loginForm" :model="form" :rules="rules" class="login-box">
       <h3 class="login-title">欢迎登录</h3>
-      <el-form-item label="账号" prop="name">
+      <el-form-item label="账号" prop="username">
         <el-input
           type="text"
           placeholder="请输入用户名"
-          v-model="form.name"
+          v-model="form.username"
         ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
@@ -18,31 +18,27 @@
       </el-form-item>
       <el-form-item>
         <!-- <el-button id="login_button" type="primary" @click="submitForm('form')">登录</el-button> -->
-        <el-button id="login_button" type="primary" @click="">登录</el-button>
-        <a href="#" id="register">立刻注册</a>
+        <el-button id="login_button" type="primary" @click="submitForm()"
+          >登录</el-button
+        >
+        <a href="/register" id="register">立刻注册</a>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
-// let validPassword=(rule,value,callback)=>{
-//       let reg= /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{4,15}$/
-//       if(!reg.test(value)){callback(new Error('密码必须是由4-15位字母+数字组合'))
-//       }else{
-//           callback()
-//       }
-//   }
+import axios from "axios";
 export default {
   name: "Login",
   data() {
     return {
       form: {
-        name: "",
-        password: "",
+        username: "test",
+        password: "qwe123456",
       },
       rules: {
-        name: [
+        username: [
           {
             required: true,
             message: "请输入用户名",
@@ -54,7 +50,7 @@ export default {
             required: true,
             message: "请输入密码",
             trigger: "blur",
-          }
+          },
           // ,
           // { validator: validPassword, trigger: 'blur' }
         ],
@@ -62,12 +58,30 @@ export default {
     };
   },
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    submitForm() {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          sessionStorage.setItem("isLogin", "true");
-          this.$store.dispatch("asyncUpdateUser", { name: this.form.name });
-          this.$router.push({ name: "Main", params: { name: this.form.name } });
+          let _this = this;
+          axios
+            .post("http://localhost:8080/login", this.form, {
+              headers: { "Content-Type": "application/json" },
+            })
+            .then(function (ressponse) {
+              if (ressponse.data != null) {
+                localStorage.setItem("access", JSON.stringify(ressponse.data));
+                _this.$message({
+                  message: "登录成功",
+                  type: "success",
+                });
+                setTimeout(() => {
+                  //设置延迟执行
+                  _this.$router.replace({ path: "/" });
+                }, 3000);
+              }
+            })
+            .catch(function (error) {
+              console.log("异常信息:" + error);
+            });
         } else {
           this.$message({
             message: "用户名或密码错误",
@@ -94,16 +108,16 @@ export default {
 .login-title {
   text-align: center;
 }
-#login_button{
-    width: 350px;
-    margin-top: 18px;
+#login_button {
+  width: 350px;
+  margin-top: 18px;
 }
-#register{
-    height: 10px;
-    float: right;
-    text-decoration: none;
-    cursor: pointer;
-    color: #4e6ef2;
-    line-height: 50px;
+#register {
+  height: 10px;
+  float: right;
+  text-decoration: none;
+  cursor: pointer;
+  color: #4e6ef2;
+  line-height: 50px;
 }
 </style>

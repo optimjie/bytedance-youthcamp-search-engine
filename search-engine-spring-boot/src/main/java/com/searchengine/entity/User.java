@@ -8,9 +8,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    private int id;
+    private String id;
 
     private String username;
 
     private String password;
+
+    private String token;
+
+    //权限
+    //权限默认为普通用户
+    private Role role = Role.DEFAULT;
 }

@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDao {
 
-    User queryOneById(String username);
+    User queryOne(String username);
+
+    int insertOne(User user);
 }

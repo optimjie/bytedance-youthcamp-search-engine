@@ -4,7 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--绑定一个对应的Dao/Map接口-->
 <mapper namespace="com.searchengine.dao.UserDao">
-    <select id="queryOneById" resultType="com.searchengine.entity.User">
+    <select id="queryOne" resultType="com.searchengine.entity.User">
         select * from user where username = #{username}
     </select>
+
+    <insert id="insertOne" parameterType="com.searchengine.entity.User">
+        insert into user(id,username,password) values(#{id},#{username},#{password})
+    </insert>
 </mapper>

@@ -43,16 +43,26 @@
             <span>&nbsp;&nbsp;</span>
             <el-popover
               placement="bottom"
-              title="用户"
+              title="个人信息"
               width="300"
               trigger="click"
               content="将来放关于用户的信息。"
             >
-              <el-button
-                slot="reference"
-                icon="el-icon-user"
-                circle
-              ></el-button>
+              <el-button slot="reference" icon="el-icon-user" circle>
+              </el-button>
+              <!--用户信息 -->
+              <div v-if="check">
+                欢迎回来！<span style="color: #55ab41">{{
+                  user.username
+                }}</span>
+                <span id="logout" @click="logout">注销</span>
+              </div>
+              <div v-if="!check">
+                <a style="color: #55ab41; margin-right: 148px;text-decoration: none;" href="/login"
+                  >对不起,请前往登录</a
+                >
+                <a style="color: #55ab41;text-decoration: none;" href="/register">注册</a>
+              </div>
             </el-popover>
           </el-col>
         </div>
@@ -88,10 +98,10 @@
             "
           >
             <div v-for="item in imgAndCaption" align="left">
-              <div> 
+              <div>
                 <!-- :style="'width:'+(item.width)" -->
                 <img
-                  style="height:200px; border-radius: 10%"
+                  style="height: 200px; border-radius: 10%"
                   :src="item.url"
                   :alt="item.caption"
                 />
@@ -153,6 +163,8 @@ export default {
       message: "123",
     };
     return {
+      user: "",
+      check: false,
       search_word: "",
       search_result: [],
       info: "",
@@ -162,18 +174,28 @@ export default {
       recordsNum: 0,
     };
   },
+  created() {
+    this.user = JSON.parse(window.localStorage.getItem("access"));
+    if (this.user != null) {
+      this.check = true;
+    }
+  },
   mounted() {
     // this.getRecordsNum();
     this.getFirstPage();
     this.getRelatedWord();
   },
   methods: {
+    logout(){
+      window.localStorage.removeItem('access');
+      location.reload();
+    },
     async search() {
       this.pageNum = 1;
       let outer = this;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:8080/search_test?word=" +
             outer.search_word +
             "&pageNum=" +
             outer.pageNum
@@ -194,20 +216,20 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:8080/search_test?word=" +
             this.search_word +
             "&pageNum=1"
         )
         .then((response) => (outer.info = response.data));
       this.recordsNum = this.info.recordsNum;
       for (let i = 0; i < this.info.records.length; i++) {
-        let img = new Image();
-        img.src = this.info.records[i].url;
-        img.height = 200
+        // let img = new Image();
+        // img.src = this.info.records[i].url;
+        // img.height = 200
         this.imgAndCaption.push({
           url: this.info.records[i].url,
           caption: this.info.records[i].caption,
-          width: (img.width / 2)+'px',
+          // width: (img.width / 2)+'px',
         });
       }
     },
@@ -216,7 +238,7 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:8080/search_test?word=" +
             this.search_word +
             "&pageNum=" +
             val
@@ -234,7 +256,7 @@ export default {
     async getRelatedWord() {
       let outer = this;
       await axios
-        .get("http://localhost:9090/related_word?word=" + outer.search_word)
+        .get("http://localhost:8080/related_word?word=" + outer.search_word)
         .then((response) => (outer.info = response.data));
       this.relatedWord = this.info;
     },
@@ -264,6 +286,7 @@ div {
   right: 0;
   top: 60px;
   bottom: 0;
+  min-width: 840px;
   /* overflow-y: scroll; */
 }
 #allrelated {
@@ -282,5 +305,10 @@ div {
   border: 1px solid #1176db8f;
   padding: 10px;
   margin: 5px;
+}
+#logout {
+  cursor: pointer;
+  float: right;
+  text-decoration: none;
 }
 </style>
