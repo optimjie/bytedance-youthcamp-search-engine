@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
 //                .antMatchers("/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/", "/register", "/login","/search_test","/related_word").permitAll()//不拦截这些路径
+                .antMatchers("/", "/register", "/login","/search_test","/related_word","/imageUpload").permitAll()//不拦截这些路径
                 .anyRequest().authenticated()
                 .and()
                 .userDetailsService(userDetailsService())

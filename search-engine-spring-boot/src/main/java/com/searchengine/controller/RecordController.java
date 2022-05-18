@@ -12,6 +12,7 @@ import com.searchengine.dto.RecordDto;
 import com.searchengine.entity.Record;
 import com.searchengine.entity.RecordSeg;
 import com.searchengine.entity.Segmentation;
+import com.searchengine.entity.User;
 import com.searchengine.service.RecordSegService;
 import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
@@ -23,10 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 @RestController
@@ -143,6 +145,35 @@ public class RecordController {
     @GetMapping("/related_word")
     public List<String> relatedWord(@RequestParam("word") String searchInfo){
         return segmentationService.getAllByWords(searchInfo);
+    }
+
+    @RequestMapping(value = "/imageUpload", method = RequestMethod.POST)
+    @ResponseBody
+    public String register(@RequestParam("file") MultipartFile file) {
+        System.out.println(file);
+        //文件上传
+        if (!file.isEmpty()) {
+            try {
+                //获取图片名称
+                String newCompanyImagepath = "D:\\"+file.getOriginalFilename();
+                File newFile = new File(newCompanyImagepath);
+                if (!newFile.exists()) {
+                    newFile.createNewFile();
+                }
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(newFile));
+                out.write(file.getBytes());
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return "图片上传失败！";
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "图片上传失败！";
+            }
+        }
+        return "图片上传失败！";
     }
 
     /**

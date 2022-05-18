@@ -15,13 +15,25 @@
               placeholder="请输入搜索内容"
               prefix-icon="el-icon-search"
             >
-              <el-button
-                style="margin-right: 10px; margin-top: 5px"
-                slot="suffix"
-                type="text"
-                @click="search"
-                >搜索</el-button
-              >
+              <template v-slot:suffix>
+                <el-upload
+                  :limit="1"
+                  action="http://localhost:9090/imageUpload"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload"
+                  style="float: left; padding-top: 5px; max-width: 37px"
+                >
+                  <i class="el-input__icon el-icon-camera"></i>
+                </el-upload>
+                <el-button
+                  style="margin-right: 10px; margin-top: 5px"
+                  slot="suffix"
+                  type="text"
+                  @click="search"
+                  >搜索</el-button
+                >
+              </template>
             </el-input>
           </div>
         </el-col>
@@ -58,10 +70,20 @@
                 <span id="logout" @click="logout">注销</span>
               </div>
               <div v-if="!check">
-                <a style="color: #55ab41; margin-right: 148px;text-decoration: none;" href="/login"
+                <a
+                  style="
+                    color: #55ab41;
+                    margin-right: 148px;
+                    text-decoration: none;
+                  "
+                  href="/login"
                   >对不起,请前往登录</a
                 >
-                <a style="color: #55ab41;text-decoration: none;" href="/register">注册</a>
+                <a
+                  style="color: #55ab41; text-decoration: none"
+                  href="/register"
+                  >注册</a
+                >
               </div>
             </el-popover>
           </el-col>
@@ -69,27 +91,43 @@
       </el-row>
     </el-header>
     <el-main>
-      <el-row>
-        <!-- 搜索结果 -->
-        <!-- <el-col :span="2">
+      <div style="display: flex">
+        <el-col :span="2" id="gen">
           <span>&nbsp;</span>
         </el-col>
-        <el-col :span="11">
-          <dl>
-            <div v-for="item in imgAndCaption" align="left">
-              <h3>{{ item.caption }}</h3>
-              <img style="width:100px;" :src="item.url">
-            </div>
-          </dl>
-        </el-col>
-        <el-col :span="11">
-
-        </el-col> -->
-
+        <div
+          style="margin-right: 15px"
+          id="text"
+          :class="{ selectedOne: picture_text === false }"
+          @click="tranfer1('text')"
+        >
+          文本
+        </div>
+        <div
+          id="picture"
+          :class="{ selectedOne: picture_text === true }"
+          @click="tranfer1('picture')"
+        >
+          图片
+        </div>
+      </div>
+      <el-row>
         <el-col :span="2">
           <span>&nbsp;</span>
         </el-col>
-        <el-col style="max-width: 1200px">
+        <!-- 搜索结果 -->
+
+        <el-col :span="11" v-if="!picture_text">
+          <dl>
+            <div v-for="item in imgAndCaption" align="left">
+              <h3>{{ item.caption }}</h3>
+              <img style="width: 100px" :src="item.url" />
+            </div>
+          </dl>
+        </el-col>
+        <el-col :span="11"> </el-col>
+
+        <el-col style="max-width: 1200px" v-if="picture_text">
           <dl
             style="
               display: flex;
@@ -99,7 +137,6 @@
           >
             <div v-for="item in imgAndCaption" align="left">
               <div>
-                <!-- :style="'width:'+(item.width)" -->
                 <img
                   style="height: 200px; border-radius: 10%"
                   :src="item.url"
@@ -113,6 +150,7 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                   "
+                  :style="'width:' + item.width"
                 >
                   {{ item.caption }}
                 </p>
@@ -163,6 +201,7 @@ export default {
       message: "123",
     };
     return {
+      // fileList: [],
       user: "",
       check: false,
       search_word: "",
@@ -172,6 +211,7 @@ export default {
       relatedWord: [],
       pageNum: 1,
       recordsNum: 0,
+      picture_text: false,
     };
   },
   created() {
@@ -186,8 +226,33 @@ export default {
     this.getRelatedWord();
   },
   methods: {
-    logout(){
-      window.localStorage.removeItem('access');
+    //上传图片后的回调函数
+    handleAvatarSuccess(){
+      console.log('上传后回调');
+    },
+    beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      },
+    //文本栏，图片栏切换
+    tranfer1(val) {
+      if (this.picture_text && val == "text") {
+        this.picture_text = !this.picture_text;
+      }
+      if (!this.picture_text && val == "picture") {
+        this.picture_text = !this.picture_text;
+      }
+    },
+    logout() {
+      window.localStorage.removeItem("access");
       location.reload();
     },
     async search() {
@@ -195,7 +260,7 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:8080/search_test?word=" +
+          "http://localhost:9090/search_test?word=" +
             outer.search_word +
             "&pageNum=" +
             outer.pageNum
@@ -216,20 +281,19 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:8080/search_test?word=" +
+          "http://localhost:9090/search_test?word=" +
             this.search_word +
             "&pageNum=1"
         )
         .then((response) => (outer.info = response.data));
       this.recordsNum = this.info.recordsNum;
       for (let i = 0; i < this.info.records.length; i++) {
-        // let img = new Image();
-        // img.src = this.info.records[i].url;
-        // img.height = 200
+        let img = new Image();
+        img.src = this.info.records[i].url;
         this.imgAndCaption.push({
           url: this.info.records[i].url,
           caption: this.info.records[i].caption,
-          // width: (img.width / 2)+'px',
+          width: (img.width * 200) / img.height + "px",
         });
       }
     },
@@ -238,7 +302,7 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:8080/search_test?word=" +
+          "http://localhost:9090/search_test?word=" +
             this.search_word +
             "&pageNum=" +
             val
@@ -256,7 +320,7 @@ export default {
     async getRelatedWord() {
       let outer = this;
       await axios
-        .get("http://localhost:8080/related_word?word=" + outer.search_word)
+        .get("http://localhost:9090/related_word?word=" + outer.search_word)
         .then((response) => (outer.info = response.data));
       this.relatedWord = this.info;
     },
@@ -310,5 +374,23 @@ div {
   cursor: pointer;
   float: right;
   text-decoration: none;
+}
+.selectedOne {
+  border-bottom: 1px solid #55ab41;
+}
+#text {
+  width: 50px;
+  height: 30px;
+  cursor: pointer;
+}
+#picture {
+  width: 50px;
+  height: 30px;
+  cursor: pointer;
+}
+@media (max-width: 1372px) {
+  #gen {
+    display: none;
+  }
 }
 </style>
