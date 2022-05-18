@@ -91,6 +91,10 @@
       </el-row>
     </el-header>
     <el-main>
+      <el-col v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgb(255 255 255)">
       <div style="display: flex">
         <el-col :span="2" id="gen">
           <span>&nbsp;</span>
@@ -119,9 +123,9 @@
 
         <el-col :span="11" v-if="!picture_text">
           <dl>
-            <div v-for="item in imgAndCaption" align="left">
-              <h3>{{ item.caption }}</h3>
-              <img style="width: 100px" :src="item.url" />
+            <div v-for="item in imgAndCaption" align="left" style="display:flex;margin-bottom:15px;">
+              <img style="min-width: 150px" :src="item.url" />
+              <h3 v-html="lightFn(item.caption, search_word)"></h3>
             </div>
           </dl>
         </el-col>
@@ -129,13 +133,9 @@
 
         <el-col style="max-width: 1200px" v-if="picture_text">
           <dl
-            style="
-              display: flex;
-              flex-wrap: wrap;
-              justify-content: space-between;
-            "
+            style="display: flex; flex-wrap: wrap; justify-content: flex-start"
           >
-            <div v-for="item in imgAndCaption" align="left">
+            <div v-for="item in imgAndCaption" align="left" class="P_item">
               <div>
                 <img
                   style="height: 200px; border-radius: 10%"
@@ -151,9 +151,8 @@
                     text-overflow: ellipsis;
                   "
                   :style="'width:' + item.width"
-                >
-                  {{ item.caption }}
-                </p>
+                  v-html="lightFn(item.caption, search_word)"
+                ></p>
               </div>
             </div>
           </dl>
@@ -188,6 +187,7 @@
         </el-col>
         <el-col :span="12"> </el-col>
       </el-row>
+      </el-col>
     </el-main>
   </el-container>
 </template>
@@ -201,7 +201,7 @@ export default {
       message: "123",
     };
     return {
-      // fileList: [],
+      loading: false,
       user: "",
       check: false,
       search_word: "",
@@ -221,27 +221,61 @@ export default {
     }
   },
   mounted() {
-    // this.getRecordsNum();
+    var load = this.loading;
     this.getFirstPage();
     this.getRelatedWord();
+    this.checkToken();
+    setInterval(() =>{
+      if (this.search_word != null && this.imgAndCaption != null && this.relatedWord != null) {
+        load = true;
+        clearInterval();
+      }
+    },1500)
+    setInterval(() => {
+      this.checkToken();
+    }, 1000 * 60 * 10); //每十分钟检查token
   },
   methods: {
+    async checkToken() {
+      var jwt = JSON.parse(window.localStorage.getItem("access"));
+      if (jwt != null) {
+        await axios
+          .get(
+            "http://localhost:9090/survival?token=" +
+              jwt.token +
+              "&username=" +
+              jwt.username
+          )
+          .then((response) => {
+            if (response.data.message != "success") {
+              this.$message.error("错了哦，这是一条错误消息");
+            }
+          });
+      }
+    },
+    lightFn(originStr, target) {
+      return originStr.replace(
+        target,
+        '<span style="color:red;">' + target + "</span>"
+      );
+    },
+
     //上传图片后的回调函数
-    handleAvatarSuccess(){
-      console.log('上传后回调');
+    handleAvatarSuccess() {
+      console.log("上传后回调");
     },
     beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
 
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-      },
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
     //文本栏，图片栏切换
     tranfer1(val) {
       if (this.picture_text && val == "text") {
@@ -387,6 +421,9 @@ div {
   width: 50px;
   height: 30px;
   cursor: pointer;
+}
+.P_item {
+  margin-right: 15px;
 }
 @media (max-width: 1372px) {
   #gen {

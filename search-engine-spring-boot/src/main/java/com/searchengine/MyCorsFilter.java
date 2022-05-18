@@ -1,6 +1,7 @@
 package com.searchengine;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -12,9 +13,12 @@ import java.io.IOException;
  * @author: optimjie
  * @description: 解决跨域问题
  * @date: 2022-05-10 17:58
+ *
+ * 2022/5/18
+ * 更名由CorsFilter成MyCorsFilter
  */
 @Component
-public class CorsFilter implements Filter {
+public class MyCorsFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;

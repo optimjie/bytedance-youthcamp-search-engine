@@ -44,6 +44,7 @@ public class RecordController {
     @Autowired
     private RecordSegService recordSegService;
 
+
     @Autowired
     private RedisUtil_db0 redisUtil;
 
@@ -150,7 +151,6 @@ public class RecordController {
     @RequestMapping(value = "/imageUpload", method = RequestMethod.POST)
     @ResponseBody
     public String register(@RequestParam("file") MultipartFile file) {
-        System.out.println(file);
         //文件上传
         if (!file.isEmpty()) {
             try {

@@ -26,10 +26,14 @@
           <span id="logout" @click="logout">注销</span>
         </div>
         <div v-if="!check">
-          <a style="color: #55ab41; margin-right: 148px;text-decoration: none;" href="/login"
+          <a
+            style="color: #55ab41; margin-right: 148px; text-decoration: none"
+            href="/login"
             >对不起,请前往登录</a
           >
-          <a style="color: #55ab41;text-decoration: none;" href="/register">注册</a>
+          <a style="color: #55ab41; text-decoration: none" href="/register"
+            >注册</a
+          >
         </div>
       </el-popover>
     </el-row>
@@ -69,10 +73,53 @@ export default {
       this.check = true;
     }
   },
+  mounted() {
+    this.checkToken();
+    setInterval(() => {
+      this.checkToken();
+    }, 1000 * 60 * 10); //每十分钟检查token
+  },
   methods: {
-    logout(){
-      window.localStorage.removeItem('access');
-      location.reload();
+    async checkToken() {
+      var jwt = JSON.parse(window.localStorage.getItem("access"));
+      if (jwt != null) {
+        await axios
+          .get(
+            "http://localhost:9090/survival?token=" +
+              jwt.token +
+              "&username=" +
+              jwt.username
+          )
+          .then((response) => {
+            if (response.data.message != "success") {
+              this.$message.error("登录时间到达,请重新登录");
+              window.localStorage.removeItem("access");
+              setTimeout(() => {
+                location.reload();
+              }, 3000);
+            }
+          });
+      }
+    },
+    async logout() {
+      var _this = this;
+      var jwt = JSON.parse(window.localStorage.getItem("access"));
+      if (jwt != null) {
+        await axios
+            .get("http://localhost:9090/user/logout?username="+jwt.username+"&token="+jwt.token)
+            .then(function (response) {
+                if (response.data.message == "success") {
+              _this.$message({
+                  message: "退出成功",
+                  type: "success",
+                })
+              window.localStorage.removeItem("access");
+              setTimeout(() => {
+                location.reload();
+              }, 3000);
+            }
+            })
+      }
     },
     search() {
       // 需要请求数据来显示

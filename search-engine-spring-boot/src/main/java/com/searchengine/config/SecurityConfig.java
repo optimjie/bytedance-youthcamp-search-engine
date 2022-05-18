@@ -1,20 +1,22 @@
 package com.searchengine.config;
 
+import com.searchengine.MyCorsFilter;
 import com.searchengine.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -33,19 +35,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.logout().logoutUrl("/logout").logoutSuccessUrl("/").permitAll();
-
-        //配置403无权限页面
-        http.exceptionHandling().accessDeniedPage("/403");
-
-        http.authorizeRequests()
-//                .antMatchers("/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/", "/register", "/login","/search_test","/related_word","/imageUpload").permitAll()//不拦截这些路径
-                .anyRequest().authenticated()
+        http
+                //关闭跨站请求防护
+                .csrf()
+                .disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)// 不通过session获取sessionContext;
                 .and()
-                .userDetailsService(userDetailsService())
-                .csrf().disable();//关闭csrf防护
-        //开启跨域访问
-        http.cors().disable();
+                .authorizeRequests()
+                .antMatchers("/user/login", "/","/user/logout", "/register", "/search_test", "/related_word", "/imageUpload","/survival").permitAll()//不拦截这些路径
+                .anyRequest().authenticated();
+
     }
 }

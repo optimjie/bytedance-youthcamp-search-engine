@@ -63,11 +63,11 @@ export default {
         if (valid) {
           let _this = this;
           axios
-            .post("http://localhost:9090/login", this.form, {
+            .post("http://localhost:9090/user/login", this.form, {
               headers: { "Content-Type": "application/json" },
             })
             .then(function (ressponse) {
-              if (ressponse.data != null) {
+              if (ressponse.data.message == "success") {
                 localStorage.setItem("access", JSON.stringify(ressponse.data));
                 _this.$message({
                   message: "登录成功",
@@ -77,6 +77,10 @@ export default {
                   //设置延迟执行
                   _this.$router.replace({ path: "/" });
                 }, 3000);
+              } else {
+                _this.$message.error({
+                  message: "登录失败",
+                });
               }
             })
             .catch(function (error) {
