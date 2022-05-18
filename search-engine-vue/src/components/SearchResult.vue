@@ -253,6 +253,26 @@ export default {
           });
       }
     },
+    async logout() {
+      var _this = this;
+      var jwt = JSON.parse(window.localStorage.getItem("access"));
+      if (jwt != null) {
+        await axios
+            .get("http://localhost:9090/user/logout?username="+jwt.username+"&token="+jwt.token)
+            .then(function (response) {
+                if (response.data.message == "success") {
+              _this.$message({
+                  message: "退出成功",
+                  type: "success",
+                })
+              window.localStorage.removeItem("access");
+              setTimeout(() => {
+                location.reload();
+              }, 3000);
+            }
+            })
+      }
+    },
     lightFn(originStr, target) {
       return originStr.replace(
         target,
@@ -284,10 +304,6 @@ export default {
       if (!this.picture_text && val == "picture") {
         this.picture_text = !this.picture_text;
       }
-    },
-    logout() {
-      window.localStorage.removeItem("access");
-      location.reload();
     },
     async search() {
       this.pageNum = 1;

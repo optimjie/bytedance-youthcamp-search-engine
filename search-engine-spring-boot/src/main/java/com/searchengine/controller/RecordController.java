@@ -161,12 +161,8 @@ public class RecordController {
      */
     @RequestMapping(value = "/imageUpload", method = RequestMethod.POST)
     @ResponseBody
-<<<<<<< HEAD
-    public String register(@RequestParam("file") MultipartFile file) {
-=======
     public List<String> register(@RequestParam("file") MultipartFile file) {
         System.out.println(file);
->>>>>>> 2a7fdd4249c5943b5b06c3ac190ed5d0ea88e0b2
         //文件上传
         if (!file.isEmpty()) {
             try {
