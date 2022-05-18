@@ -76,8 +76,10 @@ public class SocketUtil {
         }
 
         for (Object url : resultMap.values()) {
-            System.out.println(url.toString());
-            urlList.add(url.toString());
+            if (!(url.toString().equals("10") || url.toString().equals("100"))){
+                System.out.println(url.toString());
+                urlList.add(url.toString());
+            }
         }
 
         return urlList;
@@ -87,15 +89,15 @@ public class SocketUtil {
      * 以图搜图
      * @return
      */
-    public List<String> img2Img(String inputUrl) throws Exception{
+    public List<String> img2Img(String filepath) throws Exception{
         List<String> urlList = new ArrayList<>();
 
         // 发送给服务端的参数 <状态码，数据>
         Map<String, String> paramMap = new HashMap<String, String>();
         //图片转换服务
-        paramMap.put("code", "100");
-        paramMap.put("sentence", inputUrl);
-        System.out.println("sentence :"+paramMap.get("sentence"));
+        paramMap.put("code", "200");
+        paramMap.put("filepath", filepath);
+        System.out.println("sentence :"+paramMap.get("filepath"));
         // map转成json字符串，需要引入fastjson依赖
         String param = JSON.toJSONString(paramMap);
 
@@ -137,8 +139,10 @@ public class SocketUtil {
         }
 
         for (Object url : resultMap.values()) {
-            System.out.println((String)url);
-            urlList.add((String) url);
+            if (!(url.toString().equals("10") || url.toString().equals("200"))){
+                System.out.println(url.toString());
+                urlList.add(url.toString());
+            }
         }
         return urlList;
     }

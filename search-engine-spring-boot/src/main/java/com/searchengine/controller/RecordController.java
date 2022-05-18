@@ -18,6 +18,7 @@ import com.searchengine.service.RecordService;
 import com.searchengine.service.SegmentationService;
 import com.searchengine.service.TService;
 import com.searchengine.utils.RedisUtil_db0;
+import com.searchengine.utils.SocketUtil;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
+
+import static com.alibaba.fastjson.JSONPatch.OperationType.add;
 
 @RestController
 @Slf4j
@@ -53,6 +56,7 @@ public class RecordController {
     @Autowired
     private TService tService;
 
+    SocketUtil socketUtil = new SocketUtil();
 
     TFIDFAnalyzer tfidfAnalyzer = new TFIDFAnalyzer();
     JiebaSegmenter segmenter = new JiebaSegmenter();
@@ -148,15 +152,27 @@ public class RecordController {
         return segmentationService.getAllByWords(searchInfo);
     }
 
+
+    /**
+     * 以图搜图
+     *
+     * @return list里面装的全是url
+     * @throws Exception
+     */
     @RequestMapping(value = "/imageUpload", method = RequestMethod.POST)
     @ResponseBody
+<<<<<<< HEAD
     public String register(@RequestParam("file") MultipartFile file) {
+=======
+    public List<String> register(@RequestParam("file") MultipartFile file) {
+        System.out.println(file);
+>>>>>>> 2a7fdd4249c5943b5b06c3ac190ed5d0ea88e0b2
         //文件上传
         if (!file.isEmpty()) {
             try {
                 //获取图片名称
-                String newCompanyImagepath = "D:\\"+file.getOriginalFilename();
-                File newFile = new File(newCompanyImagepath);
+                String newCompanyImagePath = "D:\\"+file.getOriginalFilename();
+                File newFile = new File(newCompanyImagePath);
                 if (!newFile.exists()) {
                     newFile.createNewFile();
                 }
@@ -165,15 +181,33 @@ public class RecordController {
                 out.write(file.getBytes());
                 out.flush();
                 out.close();
-            } catch (FileNotFoundException e) {
+
+                return socketUtil.img2Img(newCompanyImagePath);
+            } catch (Exception e) {
                 e.printStackTrace();
-                return "图片上传失败！";
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "图片上传失败！";
+                ArrayList<String> list = new ArrayList<>();
+                list.add("图片上传失败!");
+
+                return list;
             }
+
         }
-        return "图片上传失败！";
+        ArrayList<String> list = new ArrayList<>();
+        list.add("图片上传失败!");
+        return list;
+    }
+
+
+
+    /**
+     * 文本转图片
+     * @param searchInfo
+     * @return list里面装的全是url
+     * @throws Exception
+     */
+    @GetMapping("/searchImg")
+    public List<String> searchImgBySentence(@RequestParam("sentence") String searchInfo) throws Exception{
+        return socketUtil.sentence2Img(searchInfo);
     }
 
     /**
