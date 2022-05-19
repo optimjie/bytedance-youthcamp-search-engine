@@ -50,11 +50,16 @@ public class TServiceImpl implements TService {
             if (first) { sb.append(segId); first = false; }
             else sb.append(',').append(segId);
         }
-        List<Record> records = tDao.getRecord(sb.toString(), pageSize, offset);
-        int recordsNum = tDao.getRecordsNum(sb.toString());
-        Map<String, Object> mp = new HashMap<>();
-        mp.put("recordsNum", recordsNum);
-        mp.put("records", records);
-        return mp;
+        System.out.println(sb.toString().equals(""));
+        if(sb.toString().equals("")){
+            return null;
+        }else{
+            List<Record> records = tDao.getRecord(sb.toString(), pageSize, offset);
+            int recordsNum = tDao.getRecordsNum(sb.toString());
+            Map<String, Object> mp = new HashMap<>();
+            mp.put("recordsNum", recordsNum);
+            mp.put("records", records);
+            return mp;
+        }
     }
 }

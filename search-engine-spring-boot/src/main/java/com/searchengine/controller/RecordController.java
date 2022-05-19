@@ -24,6 +24,7 @@ import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,6 +53,9 @@ public class RecordController {
     private RedisUtil_db0 redisUtil;
 
     private final int pageSize = 15;
+
+    @Value(("${web.upload-path}"))
+    private String uploadPath;
 
     @Autowired
     private TService tService;
@@ -166,19 +170,15 @@ public class RecordController {
         //文件上传
         if (!file.isEmpty()) {
             try {
-                //获取图片名称
-                String newCompanyImagePath = "D:\\"+file.getOriginalFilename();
-                File newFile = new File(newCompanyImagePath);
-                if (!newFile.exists()) {
-                    newFile.createNewFile();
+                //获取图片名称,先再G盘下创建images文件夹，这样不用File.exists()检查文件夹是否存在
+                String fileName = file.getOriginalFilename();
+                String saveUri = uploadPath+"/"+fileName;
+                File saveFile = new File(saveUri);
+                if (!saveFile.exists()){
+                    saveFile.mkdirs();
                 }
-                BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(newFile));
-                out.write(file.getBytes());
-                out.flush();
-                out.close();
-
-                return socketUtil.img2Img(newCompanyImagePath);
+                file.transferTo(saveFile);
+                return socketUtil.img2Img(saveUri);
             } catch (Exception e) {
                 e.printStackTrace();
                 ArrayList<String> list = new ArrayList<>();

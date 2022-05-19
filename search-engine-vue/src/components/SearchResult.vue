@@ -4,7 +4,7 @@
       <el-row style="height: 200px; width: 1524px; display: flex">
         <el-col style="width: 100px; margin-right: 10px">
           <div>
-            <img src="~@/assets/1057inRes.png" alt="" />
+            <a href="/"><img src="~@/assets/1057inRes.png" alt="" /></a>
           </div>
         </el-col>
         <el-col>
@@ -30,7 +30,7 @@
                   style="margin-right: 10px; margin-top: 5px"
                   slot="suffix"
                   type="text"
-                  @click="search"
+                  @click="searcher"
                   >搜索</el-button
                 >
               </template>
@@ -90,103 +90,137 @@
         </div>
       </el-row>
     </el-header>
+
     <el-main>
-      <el-col v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgb(255 255 255)">
-      <div style="display: flex">
-        <el-col :span="2" id="gen">
-          <span>&nbsp;</span>
-        </el-col>
-        <div
-          style="margin-right: 15px"
-          id="text"
-          :class="{ selectedOne: picture_text === false }"
-          @click="tranfer1('text')"
-        >
-          文本
-        </div>
-        <div
-          id="picture"
-          :class="{ selectedOne: picture_text === true }"
-          @click="tranfer1('picture')"
-        >
-          图片
-        </div>
-      </div>
-      <el-row>
-        <el-col :span="2">
-          <span>&nbsp;</span>
-        </el-col>
-        <!-- 搜索结果 -->
-
-        <el-col :span="11" v-if="!picture_text">
-          <dl>
-            <div v-for="item in imgAndCaption" align="left" style="display:flex;margin-bottom:15px;">
-              <img style="min-width: 150px" :src="item.url" />
-              <h3 v-html="lightFn(item.caption, search_word)"></h3>
-            </div>
-          </dl>
-        </el-col>
-        <el-col :span="11"> </el-col>
-
-        <el-col style="max-width: 1200px" v-if="picture_text">
-          <dl
-            style="display: flex; flex-wrap: wrap; justify-content: flex-start"
+      <el-col
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgb(255 255 255)"
+      >
+        <div style="display: flex">
+          <el-col :span="2" id="gen">
+            <span>&nbsp;</span>
+          </el-col>
+          <div
+            style="margin-right: 15px"
+            id="text"
+            :class="{ selectedOne: picture_text === false }"
+            @click="tranfer1('text')"
           >
-            <div v-for="item in imgAndCaption" align="left" class="P_item">
-              <div>
-                <img
-                  style="height: 200px; border-radius: 10%"
-                  :src="item.url"
-                  :alt="item.caption"
-                />
-                <p
-                  style="
-                    font-size: 10px;
-                    overflow: hidden;
-                    word-break: keep-all;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                  "
-                  :style="'width:' + item.width"
-                  v-html="lightFn(item.caption, search_word)"
-                ></p>
+            文本
+          </div>
+          <div
+            id="picture"
+            :class="{ selectedOne: picture_text === true }"
+            @click="tranfer1('picture')"
+          >
+            图片
+          </div>
+        </div>
+        <el-row>
+          <el-col :span="2">
+            <span>&nbsp;</span>
+          </el-col>
+          <!-- 搜索结果 -->
+
+          <el-col :span="11" v-if="!picture_text">
+            <dl>
+              <div v-if="recordsNum != 0">
+                <div
+                v-for="item in imgAndCaption"
+                align="left"
+                style="display: flex; margin-bottom: 15px"
+              >
+                <!-- <img style="min-width: 150px" :src="item.url" /> -->
+                <a :href="item.url" target="_blank"
+                  ><h3 v-html="lightFn(item.caption, search_word1)"></h3
+                ></a>
+              </div>
+              </div>
+              <div v-if="recordsNum == 0">
+                <div style="display: flex; margin-bottom: 15px">
+                <div><h1>抱歉没有找到与<span style="color:#55ab41">{{search_word}}</span>相关的文本。</h1></div>
+              </div>
+              </div>
+              
+            </dl>
+          </el-col>
+          <el-col :span="11"> </el-col>
+
+          <el-col style="max-width: 1200px" v-if="picture_text">
+            <dl
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+              "
+            >
+            <div v-if="recordsNum != 0">
+              <div v-for="item in imgAndCaption" align="left" class="P_item">
+                <div>
+                  <img
+                    style="height: 200px; border-radius: 10%"
+                    :src="item.url"
+                    :alt="item.caption"
+                  />
+                  <p
+                    style="
+                      font-size: 10px;
+                      overflow: hidden;
+                      word-break: keep-all;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                    "
+                    :style="'width:' + item.width"
+                    v-html="lightFn(item.caption, search_word1)"
+                  ></p>
+                </div>
               </div>
             </div>
-          </dl>
-        </el-col>
-        <el-col> </el-col>
-      </el-row>
-      <el-row>
-        <!-- 相关搜索 -->
-        <h3 style="width: 100px; margin-left: 100px; color: #248e24">
-          相关搜索
-        </h3>
-        <div id="allrelated">
-          <div class="related" v-for="rw in relatedWord">{{ rw }}</div>
-        </div>
-      </el-row>
-      <el-row>
-        <el-col :span="2">
-          <span>&nbsp;</span>
-        </el-col>
-        <el-col :span="11">
-          <div align="left">
-            <el-pagination
-              background
-              @current-change="handleCurrentChange"
-              :current-page="pageNum"
-              :page-size="2"
-              layout="prev, pager, next, jumper"
-              :total="recordsNum"
+              <div v-if="recordsNum == 0">
+                <div style="display: flex; margin-bottom: 15px">
+                <div><h1>抱歉没有找到与<span style="color:#55ab41">{{search_word}}</span>相关的图片。</h1></div>
+              </div>
+              </div>
+            </dl>
+          </el-col>
+          <el-col> </el-col>
+        </el-row>
+        <el-row>
+          <!-- 相关搜索 -->
+          <h3 style="width: 100px; margin-left: 100px; color: #248e24">
+            相关搜索
+          </h3>
+          <div id="allrelated">
+            <div
+              class="related"
+              v-for="rw in relatedWord"
+              @click="searchRelated({ rw })"
             >
-            </el-pagination>
+              {{ rw }}
+            </div>
           </div>
-        </el-col>
-        <el-col :span="12"> </el-col>
-      </el-row>
+        </el-row>
+        <el-row>
+          <el-col :span="2">
+            <span>&nbsp;</span>
+          </el-col>
+          <el-col :span="11">
+            <div align="left">
+              <el-pagination
+                background
+                @current-change="handleCurrentChange"
+                :current-page="pageNum"
+                :page-size="2"
+                layout="prev, pager, next, jumper"
+                :total="recordsNum"
+              >
+              </el-pagination>
+            </div>
+          </el-col>
+          <el-col :span="12"> </el-col>
+        </el-row>
       </el-col>
     </el-main>
   </el-container>
@@ -201,11 +235,12 @@ export default {
       message: "123",
     };
     return {
+      upImage: [],
       loading: false,
       user: "",
       check: false,
       search_word: "",
-      search_result: [],
+      search_word1: "",
       info: "",
       imgAndCaption: [],
       relatedWord: [],
@@ -221,21 +256,28 @@ export default {
     }
   },
   mounted() {
-    var load = this.loading;
     this.getFirstPage();
     this.getRelatedWord();
     this.checkToken();
-    setInterval(() =>{
-      if (this.search_word != null && this.imgAndCaption != null && this.relatedWord != null) {
-        load = true;
-        clearInterval();
-      }
-    },1500)
+    this.checkLoading();
     setInterval(() => {
       this.checkToken();
     }, 1000 * 60 * 10); //每十分钟检查token
   },
   methods: {
+    checkLoading() {
+      const _this = this;
+      setInterval(() => {
+        if (
+          this.search_word != null &&
+          this.imgAndCaption != null &&
+          this.relatedWord != null
+        ) {
+          _this.load = true;
+          clearInterval();
+        }
+      }, 2000);
+    },
     async checkToken() {
       var jwt = JSON.parse(window.localStorage.getItem("access"));
       if (jwt != null) {
@@ -258,19 +300,24 @@ export default {
       var jwt = JSON.parse(window.localStorage.getItem("access"));
       if (jwt != null) {
         await axios
-            .get("http://localhost:9090/user/logout?username="+jwt.username+"&token="+jwt.token)
-            .then(function (response) {
-                if (response.data.message == "success") {
+          .get(
+            "http://localhost:9090/user/logout?username=" +
+              jwt.username +
+              "&token=" +
+              jwt.token
+          )
+          .then(function (response) {
+            if (response.data.message == "success") {
               _this.$message({
-                  message: "退出成功",
-                  type: "success",
-                })
+                message: "退出成功",
+                type: "success",
+              });
               window.localStorage.removeItem("access");
               setTimeout(() => {
                 location.reload();
               }, 3000);
             }
-            })
+          });
       }
     },
     lightFn(originStr, target) {
@@ -281,8 +328,20 @@ export default {
     },
 
     //上传图片后的回调函数
-    handleAvatarSuccess() {
-      console.log("上传后回调");
+    handleAvatarSuccess(response) {
+      if (response[0] == "图片上传失败!") {
+        this.$message.error("图片上传失败!");
+      } else {
+        // upImage = response;
+
+        this.imgAndCaption = []; //<========================赋值到此
+        for (let i = 0; i < response.length; i++) {
+          this.imgAndCaption.push({
+            url: response[i].url,
+            caption: response[i].caption,
+          });
+        }
+      }
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -305,9 +364,19 @@ export default {
         this.picture_text = !this.picture_text;
       }
     },
+    searcher() {
+      this.$router.push({
+        path: "/search",
+        query: {
+          word: this.search_word,
+        },
+      });
+      location.reload();
+    },
     async search() {
       this.pageNum = 1;
       let outer = this;
+      this.search_word1 = this.search_word;
       await axios
         .get(
           "http://localhost:9090/search_test?word=" +
@@ -316,18 +385,34 @@ export default {
             outer.pageNum
         )
         .then((response) => (outer.info = response.data));
-      this.imgAndCaption = [];
-      this.recordsNum = this.info.recordsNum;
-      for (let i = 0; i < this.info.records.length; i++) {
-        this.imgAndCaption.push({
-          url: this.info.records[i].url,
-          caption: this.info.records[i].caption,
-        });
+      if (this.info != "") {
+        this.imgAndCaption = [];
+        this.recordsNum = this.info.recordsNum;
+        for (let i = 0; i < this.info.records.length; i++) {
+          this.imgAndCaption.push({
+            url: this.info.records[i].url,
+            caption: this.info.records[i].caption,
+          });
+        }
+      } else {
+        this.imgAndCaption = [];
+        this.recordsNum = 0;
       }
+      this.getRelatedWord();
+    },
+    async searchRelated(word) {
+      this.$router.push({
+        path: "/search",
+        query: {
+          word: word.rw,
+        },
+      });
+      location.reload();
     },
     async getFirstPage() {
       this.recordsNum = this.$route.query.recordsNum;
       this.search_word = this.$route.query.word;
+      this.search_word1 = this.$route.query.word;
       let outer = this;
       await axios
         .get(
@@ -336,15 +421,20 @@ export default {
             "&pageNum=1"
         )
         .then((response) => (outer.info = response.data));
-      this.recordsNum = this.info.recordsNum;
-      for (let i = 0; i < this.info.records.length; i++) {
-        let img = new Image();
-        img.src = this.info.records[i].url;
-        this.imgAndCaption.push({
-          url: this.info.records[i].url,
-          caption: this.info.records[i].caption,
-          width: (img.width * 200) / img.height + "px",
-        });
+      if (this.info != "") {
+        this.recordsNum = this.info.recordsNum;
+        for (let i = 0; i < this.info.records.length; i++) {
+          let img = new Image();
+          img.src = this.info.records[i].url;
+          this.imgAndCaption.push({
+            url: this.info.records[i].url,
+            caption: this.info.records[i].caption,
+            width: (img.width * 200) / img.height + "px",
+          });
+        }
+      } else {
+        this.imgAndCaption = [];
+        this.recordsNum = 0;
       }
     },
     async handleCurrentChange(val) {
@@ -382,6 +472,10 @@ export default {
 div {
   white-space: nowrap;
 }
+a {
+  text-decoration: none;
+  color: #55ab41;
+}
 .input .el-input__inner {
   height: 50px;
 }
@@ -415,7 +509,7 @@ div {
   width: 258px;
   text-align: left;
   margin-right: 10px;
-
+  cursor: pointer;
   border: 1px solid #1176db8f;
   padding: 10px;
   margin: 5px;

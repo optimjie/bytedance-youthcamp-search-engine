@@ -38,7 +38,9 @@
       </el-popover>
     </el-row>
     <el-row id="input">
-      <img src="~@/assets/1057.png" alt="" />
+      <div>
+        <img src="~@/assets/1057.png" alt="" />
+      </div>
       <el-input
         v-model="search_word"
         placeholder="请输入搜索内容"

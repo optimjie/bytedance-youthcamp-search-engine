@@ -127,11 +127,18 @@ public class SegmentationServiceImpl implements SegmentationService {
     public List<String> getAllByWords(String word) {
         List<Segmentation> segmentation = segmentationDao.getAllByWords(word + "%");
         List<String> newList = new ArrayList<>();
-        for(int i=0;i<8;i++) {
-            Random random = new Random();
-            int index = random.nextInt(segmentation.size());
-            newList.add(segmentation.get(index).getWord());
-            segmentation.remove(index);
+        System.out.println(segmentation.size());
+        if(segmentation.size() >= 8){
+            for(int i=0;i<8;i++) {
+                Random random = new Random();
+                int index = random.nextInt(segmentation.size());
+                newList.add(segmentation.get(index).getWord());
+                segmentation.remove(index);
+            }
+        }else{
+            for (Segmentation segmentation1 : segmentation) {
+                newList.add(segmentation1.getWord());
+            }
         }
         return newList;
     }

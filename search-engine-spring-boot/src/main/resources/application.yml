@@ -1,4 +1,9 @@
+web:
+  upload-path: G:/images
+
 spring:
+  resources:
+    static-locations: file:${web.upload-path}
   redis:
     host: 127.0.0.1
     port: 6379
