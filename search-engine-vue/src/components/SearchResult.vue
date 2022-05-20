@@ -105,87 +105,128 @@
           <div
             style="margin-right: 15px"
             id="text"
-            :class="{ selectedOne: picture_text === false }"
+            :class="{ selectedOne: picture_text === 1 }"
             @click="tranfer1('text')"
           >
             文本
           </div>
           <div
             id="picture"
-            :class="{ selectedOne: picture_text === true }"
+            :class="{ selectedOne: picture_text === 2 }"
             @click="tranfer1('picture')"
           >
             图片
           </div>
+          <div
+            id="picture"
+            :class="{
+              selectedOne: picture_text === 3,
+              picToPic: picTopic1 === false,
+            }"
+            @click="tranfer1('picToPic')"
+          >
+            搜图
+          </div>
         </div>
         <el-row>
-          <el-col :span="2">
+          <el-col :span="2" :class="{picToPic : picture_text == 3}">
             <span>&nbsp;</span>
           </el-col>
           <!-- 搜索结果 -->
 
-          <el-col :span="11" v-if="!picture_text">
+          <el-col :span="11" v-if="picture_text == 1">
             <dl>
               <div v-if="recordsNum != 0">
                 <div
-                v-for="item in imgAndCaption"
-                align="left"
-                style="display: flex; margin-bottom: 15px"
-              >
-                <!-- <img style="min-width: 150px" :src="item.url" /> -->
-                <a :href="item.url" target="_blank"
-                  ><h3 v-html="lightFn(item.caption, search_word1)"></h3
-                ></a>
-              </div>
+                  v-for="item in imgAndCaption"
+                  align="left"
+                  style="display: flex; margin-bottom: 15px"
+                >
+                  <!-- <img style="min-width: 150px" :src="item.url" /> -->
+                  <a :href="item.url" target="_blank"
+                    ><h3 v-html="lightFn(item.caption, search_word1)"></h3
+                  ></a>
+                </div>
               </div>
               <div v-if="recordsNum == 0">
                 <div style="display: flex; margin-bottom: 15px">
-                <div><h1>抱歉没有找到与<span style="color:#55ab41">{{search_word}}</span>相关的文本。</h1></div>
+                  <div>
+                    <h1>
+                      抱歉没有找到与<span style="color: #55ab41">{{
+                        search_word
+                      }}</span
+                      >相关的文本。
+                    </h1>
+                  </div>
+                </div>
               </div>
-              </div>
-              
             </dl>
           </el-col>
           <el-col :span="11"> </el-col>
 
-          <el-col style="max-width: 1200px" v-if="picture_text">
-            <dl
-              style="
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-              "
-            >
-            <div v-if="recordsNum != 0">
-              <div v-for="item in imgAndCaption" align="left" class="P_item">
-                <div>
-                  <img
-                    style="height: 200px; border-radius: 10%"
-                    :src="item.url"
-                    :alt="item.caption"
-                  />
-                  <p
-                    style="
-                      font-size: 10px;
-                      overflow: hidden;
-                      word-break: keep-all;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                    "
-                    :style="'width:' + item.width"
-                    v-html="lightFn(item.caption, search_word1)"
-                  ></p>
+          <el-col style="max-width: 1200px" v-if="picture_text == 2">
+            <dl>
+              <div
+                v-if="recordsNum != 0"
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  justify-content: flex-start;
+                "
+              >
+                <div v-for="item in imgAndCaption" align="left" class="P_item">
+                  <div>
+                    <img
+                      style="height: 200px; border-radius: 10%"
+                      :src="item.url"
+                      :alt="item.caption"
+                    />
+                    <p
+                      style="
+                        font-size: 10px;
+                        overflow: hidden;
+                        word-break: keep-all;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                      "
+                      :style="'width:' + item.width"
+                      v-html="lightFn(item.caption, search_word1)"
+                    ></p>
+                  </div>
                 </div>
               </div>
-            </div>
               <div v-if="recordsNum == 0">
                 <div style="display: flex; margin-bottom: 15px">
-                <div><h1>抱歉没有找到与<span style="color:#55ab41">{{search_word}}</span>相关的图片。</h1></div>
-              </div>
+                  <div>
+                    <h1>
+                      抱歉没有找到与<span style="color: #55ab41">{{
+                        search_word
+                      }}</span
+                      >相关的图片。
+                    </h1>
+                  </div>
+                </div>
               </div>
             </dl>
           </el-col>
-          <el-col> </el-col>
+
+          <el-col :span="11" v-if="picture_text == 3">
+            <dl>
+              <div style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  justify-content: flex-start;
+                  min-width:850px
+                ">
+                <div
+                  v-for="item in imgAndCaption1"
+                  align="left"
+                >
+                  <img style="height: 200px;margin-right:15px; border-radius: 10%" :src="item.url" />
+                </div>
+              </div>
+            </dl>
+          </el-col>
         </el-row>
         <el-row>
           <!-- 相关搜索 -->
@@ -243,10 +284,12 @@ export default {
       search_word1: "",
       info: "",
       imgAndCaption: [],
+      imgAndCaption1: [],
       relatedWord: [],
       pageNum: 1,
       recordsNum: 0,
-      picture_text: false,
+      picture_text: 1,
+      picTopic1: false,
     };
   },
   created() {
@@ -326,19 +369,17 @@ export default {
         '<span style="color:red;">' + target + "</span>"
       );
     },
-
+    //以图搜图的展示
     //上传图片后的回调函数
     handleAvatarSuccess(response) {
       if (response[0] == "图片上传失败!") {
         this.$message.error("图片上传失败!");
       } else {
-        // upImage = response;
-
-        this.imgAndCaption = []; //<========================赋值到此
+        this.picTopic1 = true;
+        this.imgAndCaption1 = []; //<========================赋值到此
         for (let i = 0; i < response.length; i++) {
-          this.imgAndCaption.push({
-            url: response[i].url,
-            caption: response[i].caption,
+          this.imgAndCaption1.push({
+            url: response[i],
           });
         }
       }
@@ -355,13 +396,16 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    //文本栏，图片栏切换
+    //文本栏，图片栏,搜图栏切换
     tranfer1(val) {
-      if (this.picture_text && val == "text") {
-        this.picture_text = !this.picture_text;
+      if (val == "text") {
+        this.picture_text = 1;
       }
-      if (!this.picture_text && val == "picture") {
-        this.picture_text = !this.picture_text;
+      if (val == "picture") {
+        this.picture_text = 2;
+      }
+      if (val == "picToPic") {
+        this.picture_text = 3;
       }
     },
     searcher() {
@@ -521,6 +565,9 @@ a {
 }
 .selectedOne {
   border-bottom: 1px solid #55ab41;
+}
+.picToPic {
+  display: none;
 }
 #text {
   width: 50px;
