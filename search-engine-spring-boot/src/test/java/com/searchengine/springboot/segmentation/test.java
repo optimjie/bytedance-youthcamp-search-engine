@@ -68,4 +68,5 @@ public class test {
         int s = segmentationDao.insertSeg("牛逼");
         log.info("id:{}",s);
     }
+
 }

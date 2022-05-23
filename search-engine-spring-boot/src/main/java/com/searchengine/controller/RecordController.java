@@ -151,6 +151,11 @@ public class RecordController {
         return tService.getRcord(searchInfo, pageSize, pageNum);
     }
 
+    @GetMapping("/search_use_split")
+    public Map<String, Object> search_use_split(@RequestParam("word") String searchInfo, @RequestParam("pageNum") int pageNum) {
+        return tService.getRcordUseSplit(searchInfo, pageSize, pageNum);
+    }
+
     @GetMapping("/related_word")
     public List<String> relatedWord(@RequestParam("word") String searchInfo){
         return segmentationService.getAllByWords(searchInfo);

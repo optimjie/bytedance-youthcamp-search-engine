@@ -5,7 +5,7 @@
 <!--绑定一个对应的Dao/Map接口-->
 <mapper namespace="com.searchengine.dao.TDao">
     <insert id="insert1" parameterType="list">
-        insert into segmentation(word)
+        insert into segmentation1(word)
         values
         <foreach collection="segs" item="item" separator=",">
             (#{item})
@@ -13,15 +13,15 @@
 
     </insert>
 
-    <insert id="insert2" parameterType="list">
-        insert into data_seg_relation(data_id, seg_id, tidif_value, count)
+    <insert id="insert2" parameterType="list" statementType="STATEMENT">
+        insert into ${tableName}(data_id, seg_id, tidif_value, count)
         values
         <foreach collection="relations" item="item" separator=",">
             (
-            #{item.dataId},
-            #{item.segId},
-            #{item.tidif},
-            #{item.count}
+            ${item.dataId},
+            ${item.segId},
+            ${item.tidif},
+            ${item.count}
             )
         </foreach>
     </insert>
@@ -40,9 +40,30 @@
             ) as t
         )
     </select>
+
+    <select id="getRecordUseSplit" resultType="com.searchengine.dto.Record">
+        select SQL_NO_CACHE url, caption from data where id in (
+            select tb2.data_id from (
+                select data_id from (
+                    ${info}
+                ) tb1
+                group by data_id
+                order by sum(tidif_value) desc limit 15 offset 0
+            ) tb2
+        )
+    </select>
     
     <select id="getRecordsNum" resultType="java.lang.Integer">
         select count(distinct data_id) from data_seg_relation
 		    where seg_id in(${segIds})
     </select>
+
+    <update id="createNewTable" parameterType="String">
+        CREATE TABLE if not exists ${tableName} (
+          `data_id` int NOT NULL,
+          `seg_id` int NOT NULL,
+          `tidif_value` double NULL DEFAULT NULL,
+          `count` int NULL DEFAULT NULL
+        )
+    </update>
 </mapper>

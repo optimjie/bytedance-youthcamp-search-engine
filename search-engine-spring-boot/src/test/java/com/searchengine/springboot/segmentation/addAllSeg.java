@@ -77,7 +77,7 @@ public class addAllSeg {
 
 
         //----------------开始加词-----------------
-        for (int loop=0;loop<100;loop++) {
+        for (int loop=0;loop<75;loop++) {
 
             List<String> segs = new ArrayList<>(10000);
             List<RecordSeg> relations = new ArrayList<>(10000);
@@ -145,6 +145,109 @@ public class addAllSeg {
 
             segmentationDao.insertBatchSeg(segs);
             recordSegDao.insertBatch(relations);
+        }
+
+    }
+
+    @Test
+    /**
+     * @author: optimjie
+     * @description: 先单纯的添加分词表，为关系表的建立做准备
+     * @date: 2022-05-23 10:53
+     */
+    public void addSegs() {
+        List<Record> records = recordService.queryAllRecord();
+        List<String> segs = new ArrayList<>(500000);
+        BloomFilter<String> bf = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")),10000000);
+        if (stopWordsSet == null) {
+            stopWordsSet = new HashSet<>();
+            loadStopWords(stopWordsSet, this.getClass().getResourceAsStream("/jieba/stop_words.txt"));
+        }
+        for (int loop = 0; loop < 75; loop++) {
+            for (int i = loop * 10000; i < (loop + 1) * 10000; i++) {
+                Record record = records.get(i);
+                String caption = record.getCaption();
+                List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
+                for (SegToken segToken : segTokens) {
+                    String word = segToken.word;
+                    if (stopWordsSet.contains(word)) continue; // 判断是否是停用词
+                    if (!bf.mightContain(word)) {
+                        bf.put(word);
+                        segs.add(word);
+                    }
+                }
+            }
+        }
+        tDao.insert1(segs);
+    }
+
+    @Test
+    /**
+     * @author: optimjie
+     * @description: 分表按照segId:1~10000,10001~20000.... 因为在关系表很大的时候，主要的瓶颈在于找到所有包含某一个segId的data再将所有的tf值加起来比较大小
+     * @date: 2022-05-23 11:01
+     */
+    public void addAllSegUseSplit() {
+        List<Record> records = recordService.queryAllRecord();
+        List<Segmentation> segmentations = segmentationService.queryAllSeg();
+        Map<String, Integer> wordToId = new HashMap<>();
+        for (Segmentation seg : segmentations) {
+            wordToId.put(seg.getWord(), seg.getId());
+        }
+        if (stopWordsSet == null) {
+            stopWordsSet = new HashSet<>();
+            loadStopWords(stopWordsSet, this.getClass().getResourceAsStream("/jieba/stop_words.txt"));
+        }
+        Map<Integer, List<T>> mp = new HashMap<>(100000);
+        int cnt = 0;
+        for (int loop = 0; loop < 75; loop++) {
+            for (int i = loop * 10000; i < (loop + 1) * 10000; i++) {
+                Record record = records.get(i);
+                String caption = record.getCaption();
+                List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
+                List<Keyword> keywords = tfidfAnalyzer.analyze(caption,5);
+                Map<String, T> countMap = new HashMap<>();
+                for (SegToken segToken : segTokens) {
+                    String word = segToken.word;
+                    if (stopWordsSet.contains(word)) continue;  // 判断是否是停用词
+                    int segId = wordToId.get(word);
+                    int dataId = record.getId();
+                    double tf = 0;
+                    for (Keyword v : keywords) {
+                        if (v.getName().equals(word)) {
+                            tf = v.getTfidfvalue();
+                            break;
+                        }
+                    }
+                    if (!countMap.containsKey(word)){
+                        int count = 1;
+                        countMap.put(word, new T(dataId, segId, tf, count));
+                    } else {
+                        T t = countMap.get(word);
+                        int count = t.getCount();
+                        t.setCount(++count);
+                        countMap.put(word,t);
+                    }
+                }
+                for (T t : countMap.values()) {
+                    int segId = t.getSegId();
+                    int idx = segId % 100;
+                    List list = mp.getOrDefault(idx, new ArrayList<>(10000));
+                    list.add(t);
+                    mp.put(idx, list);
+                    cnt++;
+                }
+                if (cnt > 100000) {  // 之所以这么搞，是因为在最后直接insert的话，会爆堆空间，虽然我已经开了4个G但好像还是不行。
+                    cnt = 0;
+                    for (Integer idx : mp.keySet()) {
+                        String tableName = "data_seg_relation_" + idx;
+                        tDao.createNewTable(tableName);
+                        tDao.insert2(mp.get(idx), tableName);
+                    }
+                    mp = new HashMap<>(100000);
+                }
+
+            }
         }
 
     }
