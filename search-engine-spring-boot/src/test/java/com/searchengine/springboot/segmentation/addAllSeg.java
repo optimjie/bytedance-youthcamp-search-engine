@@ -200,7 +200,7 @@ public class addAllSeg {
         }
         Map<Integer, List<T>> mp = new HashMap<>(100000);
         int cnt = 0;
-        for (int loop = 0; loop < 75; loop++) {
+        for (int loop = 0; loop < 4; loop++) {
             for (int i = loop * 10000; i < (loop + 1) * 10000; i++) {
                 Record record = records.get(i);
                 String caption = record.getCaption();

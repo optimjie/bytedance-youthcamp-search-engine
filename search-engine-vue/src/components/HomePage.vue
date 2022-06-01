@@ -42,6 +42,7 @@
         <img src="~@/assets/1057.png" alt="" />
       </div>
       <el-input
+        @keyup.enter.native="search" 
         v-model="search_word"
         placeholder="请输入搜索内容"
         prefix-icon="el-icon-search"
@@ -121,6 +122,8 @@ export default {
               }, 3000);
             }
             })
+      }else{
+        location.reload();
       }
     },
     search() {

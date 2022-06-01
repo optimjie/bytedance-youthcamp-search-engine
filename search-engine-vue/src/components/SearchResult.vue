@@ -10,6 +10,7 @@
         <el-col>
           <div class="input" style="text-align: left">
             <el-input
+            @keyup.enter.native="search" 
               style="width: 560px"
               v-model="search_word"
               placeholder="请输入搜索内容"
@@ -52,12 +53,23 @@
                 circle
               ></el-button>
               <div v-if="check">
-                <favorites :username="user.username" :addToFavorite="0" ref="favorites"></favorites>
+                <favorites
+                  :username="user.username"
+                  :addToFavorite="0"
+                  ref="favorites"
+                ></favorites>
               </div>
               <div v-if="!check">
-                <a style="color: #55ab41; margin-right: 148px; text-decoration: none;"href="/login">对不起,请前往登录</a>
+                <a
+                  style="
+                    color: #55ab41;
+                    margin-right: 148px;
+                    text-decoration: none;
+                  "
+                  href="/login"
+                  >对不起,请前往登录</a
+                >
               </div>
-
             </el-popover>
             <span>&nbsp;&nbsp;</span>
             <el-popover
@@ -136,7 +148,7 @@
           </div>
         </div>
         <el-row>
-          <el-col :span="2" :class="{picToPic : picture_text == 3}">
+          <el-col :span="2" :class="{ picToPic: picture_text == 3 }">
             <span>&nbsp;</span>
           </el-col>
           <!-- 搜索结果 -->
@@ -147,10 +159,23 @@
                 <div
                   v-for="item in imgAndCaption"
                   align="left"
-                  style="display: flex; margin-bottom: 15px"
+                  style="
+                    display: flex;
+                    margin-bottom: 15px;
+                    align-items: center;
+                  "
                 >
-                  <el-button @click="addToFavorite(item)">收藏</el-button>
-                  <a :href="item.url" target="_blank" style="white-space:nowrap;word-break:break-all;">
+                  <el-button
+                    type="success"
+                    @click="addToFavorite(item)"
+                    style="margin-right: 10px"
+                    >收藏</el-button
+                  >
+                  <a
+                    :href="item.url"
+                    target="_blank"
+                    style="white-space: nowrap; word-break: break-all"
+                  >
                     <h3 v-html="lightFn(item.caption, search_word1)"></h3>
                   </a>
                 </div>
@@ -219,17 +244,23 @@
 
           <el-col :span="11" v-if="picture_text == 3">
             <dl>
-              <div style="
+              <div
+                style="
                   display: flex;
                   flex-wrap: wrap;
                   justify-content: flex-start;
-                  min-width:850px
-                ">
-                <div
-                  v-for="item in imgAndCaption1"
-                  align="left"
-                >
-                  <img style="height: 200px;margin-right:15px; border-radius: 10%" :src="item.url" />
+                  min-width: 850px;
+                "
+              >
+                <div v-for="item in imgAndCaption1" align="left">
+                  <img
+                    style="
+                      height: 200px;
+                      margin-right: 15px;
+                      border-radius: 10%;
+                    "
+                    :src="item.url"
+                  />
                 </div>
               </div>
             </dl>
@@ -270,46 +301,48 @@
           <el-col :span="12"> </el-col>
         </el-row>
       </el-col>
-
     </el-main>
 
-    <el-dialog
+    <div v-if="check">
+      <el-dialog
         title="请选择添加位置"
         :visible.sync="addToFavoritedialogVisible"
-        width="20%">
-      <favorites :username="user.username" :addToFavorite="1" ref="favorites" @notShowDialog="change"></favorites>
-      <span>
-        <br>
-      </span>
-<!--      <span slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="addToFavoritedialogVisible = false">取 消</el-button>-->
-<!--        <el-button type="primary" @click="addToFavoritedialogVisible = false">确 定</el-button>-->
-<!--      </span>-->
-    </el-dialog>
-
+        width="20%"
+      >
+        <favorites
+          :username="user.username"
+          :addToFavorite="1"
+          ref="favorites"
+          @notShowDialog="change"
+        ></favorites>
+        <span>
+          <br />
+        </span>
+        <!--      <span slot="footer" class="dialog-footer">-->
+        <!--        <el-button @click="addToFavoritedialogVisible = false">取 消</el-button>-->
+        <!--        <el-button type="primary" @click="addToFavoritedialogVisible = false">确 定</el-button>-->
+        <!--      </span>-->
+      </el-dialog>
+    </div>
   </el-container>
 </template>
 
 <script>
 import axios from "axios";
 
-import favorites from "./Favorites"
+import favorites from "./Favorites";
 // import Favorites from "@/components/Favorites";
 // import AddFavorites from "@/components/AddFavorites";
 
 export default {
-  components: {favorites},
-  // comments: {
-  //   favorites,
-  //   addFavorites
-  // },
+  components: { favorites },
   data() {
     const item = {
       message: "123",
     };
     return {
       upImage: [],
-      loading: false,
+      loading: true,
       user: "",
       check: false,
       search_word: "",
@@ -333,13 +366,15 @@ export default {
   },
   mounted() {
     // 不知道为什么只有这样才能获取第一次的值
-    this.addToFavoritedialogVisible = true
+    this.addToFavoritedialogVisible = true;
     setTimeout(() => {
-      this.addToFavoritedialogVisible = false
-    }, 1)
+      this.addToFavoritedialogVisible = false;
+    }, 1);
     this.getFirstPage();
     this.getRelatedWord();
-    this.checkToken();
+    if (window.localStorage.getItem("access") != null) {
+      this.checkToken();
+    }
     this.checkLoading();
     setInterval(() => {
       this.checkToken();
@@ -348,13 +383,17 @@ export default {
   methods: {
     // =========收藏夹========
     addToFavorite(item) {
-      var url = item.url
-      var caption = item.caption
-      this.$refs.favorites.addFavorite(url, caption)
-      this.addToFavoritedialogVisible = true
+      if (localStorage.getItem("access") == null) {
+        this.$message.error("请先登录");
+      }else{
+        var url = item.url;
+        var caption = item.caption;
+        this.$refs.favorites.addFavorite(url, caption);
+        this.addToFavoritedialogVisible = true;
+      }
     },
     change() {
-      this.addToFavoritedialogVisible = false
+      this.addToFavoritedialogVisible = false;
     },
     // =======收藏夹结束======
     checkLoading() {
@@ -365,7 +404,7 @@ export default {
           this.imgAndCaption != null &&
           this.relatedWord != null
         ) {
-          _this.load = true;
+          _this.loading = false;
           clearInterval();
         }
       }, 2000);
@@ -382,7 +421,7 @@ export default {
           )
           .then((response) => {
             if (response.data.message != "success") {
-              this.$message.error("错了哦，这是一条错误消息");
+              this.$message.error("登录已失效，请重新登录");
             }
           });
       }
@@ -405,11 +444,14 @@ export default {
                 type: "success",
               });
               window.localStorage.removeItem("access");
+              _this.check = false;
               setTimeout(() => {
                 location.reload();
               }, 3000);
             }
           });
+      }else{
+        location.reload();
       }
     },
     lightFn(originStr, target) {
@@ -587,7 +629,7 @@ a {
   right: 0;
   top: 60px;
   bottom: 0;
-  min-width: 840px;
+  min-width: 1119px;
   /* overflow-y: scroll; */
 }
 #allrelated {
