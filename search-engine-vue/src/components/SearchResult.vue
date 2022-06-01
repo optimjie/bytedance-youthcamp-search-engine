@@ -51,6 +51,13 @@
                 icon="el-icon-folder"
                 circle
               ></el-button>
+              <div v-if="check">
+                <favorites :username="user.username" :addToFavorite="0" ref="favorites"></favorites>
+              </div>
+              <div v-if="!check">
+                <a style="color: #55ab41; margin-right: 148px; text-decoration: none;"href="/login">对不起,请前往登录</a>
+              </div>
+
             </el-popover>
             <span>&nbsp;&nbsp;</span>
             <el-popover
@@ -142,10 +149,10 @@
                   align="left"
                   style="display: flex; margin-bottom: 15px"
                 >
-                  <!-- <img style="min-width: 150px" :src="item.url" /> -->
-                  <a :href="item.url" target="_blank"
-                    ><h3 v-html="lightFn(item.caption, search_word1)"></h3
-                  ></a>
+                  <el-button @click="addToFavorite(item)">收藏</el-button>
+                  <a :href="item.url" target="_blank" style="white-space:nowrap;word-break:break-all;">
+                    <h3 v-html="lightFn(item.caption, search_word1)"></h3>
+                  </a>
                 </div>
               </div>
               <div v-if="recordsNum == 0">
@@ -263,14 +270,39 @@
           <el-col :span="12"> </el-col>
         </el-row>
       </el-col>
+
     </el-main>
+
+    <el-dialog
+        title="请选择添加位置"
+        :visible.sync="addToFavoritedialogVisible"
+        width="20%">
+      <favorites :username="user.username" :addToFavorite="1" ref="favorites" @notShowDialog="change"></favorites>
+      <span>
+        <br>
+      </span>
+<!--      <span slot="footer" class="dialog-footer">-->
+<!--        <el-button @click="addToFavoritedialogVisible = false">取 消</el-button>-->
+<!--        <el-button type="primary" @click="addToFavoritedialogVisible = false">确 定</el-button>-->
+<!--      </span>-->
+    </el-dialog>
+
   </el-container>
 </template>
 
 <script>
 import axios from "axios";
 
+import favorites from "./Favorites"
+// import Favorites from "@/components/Favorites";
+// import AddFavorites from "@/components/AddFavorites";
+
 export default {
+  components: {favorites},
+  // comments: {
+  //   favorites,
+  //   addFavorites
+  // },
   data() {
     const item = {
       message: "123",
@@ -290,6 +322,7 @@ export default {
       recordsNum: 0,
       picture_text: 1,
       picTopic1: false,
+      addToFavoritedialogVisible: false,
     };
   },
   created() {
@@ -299,6 +332,11 @@ export default {
     }
   },
   mounted() {
+    // 不知道为什么只有这样才能获取第一次的值
+    this.addToFavoritedialogVisible = true
+    setTimeout(() => {
+      this.addToFavoritedialogVisible = false
+    }, 1)
     this.getFirstPage();
     this.getRelatedWord();
     this.checkToken();
@@ -308,6 +346,17 @@ export default {
     }, 1000 * 60 * 10); //每十分钟检查token
   },
   methods: {
+    // =========收藏夹========
+    addToFavorite(item) {
+      var url = item.url
+      var caption = item.caption
+      this.$refs.favorites.addFavorite(url, caption)
+      this.addToFavoritedialogVisible = true
+    },
+    change() {
+      this.addToFavoritedialogVisible = false
+    },
+    // =======收藏夹结束======
     checkLoading() {
       const _this = this;
       setInterval(() => {
@@ -423,7 +472,7 @@ export default {
       this.search_word1 = this.search_word;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:9090/search_use_split?word=" +
             outer.search_word +
             "&pageNum=" +
             outer.pageNum
@@ -460,7 +509,7 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:9090/search_use_split?word=" +
             this.search_word +
             "&pageNum=1"
         )
@@ -486,7 +535,7 @@ export default {
       let outer = this;
       await axios
         .get(
-          "http://localhost:9090/search_test?word=" +
+          "http://localhost:9090/search_use_split?word=" +
             this.search_word +
             "&pageNum=" +
             val
