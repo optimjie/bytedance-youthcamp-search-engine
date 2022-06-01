@@ -1,6 +1,8 @@
 package com.searchengine.controller;
 
+import com.searchengine.dao.UserDao;
 import com.searchengine.entity.Role;
+import com.searchengine.entity.TreeNode;
 import com.searchengine.entity.User;
 import com.searchengine.service.UserService;
 import com.searchengine.utils.RedisUtil_db0;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -21,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
     private RedisUtil_db0 redisUtil;
@@ -86,5 +92,39 @@ public class UserController {
             rs.put("message", "error");
         }
         return rs;
+    }
+
+    @GetMapping("/getFavorites")
+    @ResponseBody
+    public List<TreeNode> getFavorite(@RequestParam("username") String username) {
+        return userService.getFavorite(username);
+    }
+
+    @PostMapping("/updateTreeNodeName")
+    @ResponseBody
+    public boolean updateTreeNodeNameById(@RequestBody Map<String,Object> params) {
+        return userDao.updateTreeNodeNameById(params.get("newName").toString(), params.get("id").toString());
+    }
+
+    @PostMapping("/deleteTreeNode")
+    @ResponseBody
+    public boolean deleteTreeNodeById(@RequestBody Map<String, Object> params) {
+        return userDao.deleteTreeNodeById(params.get("id").toString());
+    }
+
+    @PostMapping("/addTreeNode")
+    @ResponseBody
+    public boolean addTreeNode(@RequestBody Map<String, Object> params) {
+        String userId = userDao.getUserIdByUsername(params.get("username").toString());
+        String url = null;
+        if (params.get("url") != null) {
+            url = params.get("url").toString();
+        }
+        return userDao.addTreeNode(params.get("id").toString(),
+                                   params.get("pid").toString(),
+                                   params.get("name").toString(),
+                                   params.get("isLeaf").toString().equals("1") ? true : false,
+                                   userId,
+                                   url);
     }
 }

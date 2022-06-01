@@ -18,10 +18,10 @@
         values
         <foreach collection="relations" item="item" separator=",">
             (
-            ${item.dataId},
-            ${item.segId},
-            ${item.tidif},
-            ${item.count}
+                ${item.dataId},
+                ${item.segId},
+                ${item.tidif},
+                ${item.count}
             )
         </foreach>
     </insert>
@@ -48,7 +48,7 @@
                     ${info}
                 ) tb1
                 group by data_id
-                order by sum(tidif_value) desc limit 15 offset 0
+                order by sum(tidif_value) desc limit ${pageSize} offset ${offset}
             ) tb2
         )
     </select>

@@ -36,3 +36,10 @@
   https://blog.csdn.net/qq_29220369/article/details/120523530 
 
   https://www.csdn.net/tags/MtTaEg4sOTEzMjUyLWJsb2cO0O0O.html
+
+
+
+#### 2022-6-1
+
+**optimjie：**收藏夹还有一点点问题，添加后得刷新下，还有dialog必须得先弹出一次，这个不知道是什么原因。
+

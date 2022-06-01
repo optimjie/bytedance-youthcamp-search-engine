@@ -11,4 +11,41 @@
     <insert id="insertOne" parameterType="com.searchengine.entity.User">
         insert into user(id,username,password) values(#{id},#{username},#{password})
     </insert>
+
+    <select id="queryAllNodesByUsername" resultType="java.lang.Integer">
+        select tree_node_id from user_tree_relation where user_id = (
+            select id from user where username = #{username}
+        )
+    </select>
+
+    <select id="queryAll" resultType="com.searchengine.entity.TreeNode">
+        select id, pid, name, isLeaf, url from tree_node
+            where user_id = (
+                select id from user where username = #{username}
+            )
+            order by id + 0
+    </select>
+
+    <update id="updateTreeNodeNameById">
+        update tree_node
+        <set>
+            <if test="newName != null">
+                name = #{newName}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTreeNodeById">
+        delete from tree_node where id = #{id};
+    </delete>
+
+    <select id="getUserIdByUsername" resultType="java.lang.String">
+        select id from user where username = #{username}
+    </select>
+
+    <insert id="addTreeNode">
+        insert into tree_node(id, pid, name, isLeaf, user_id, url) values(#{id}, #{pid}, #{name}, #{isLeaf}, #{userId}, #{url})
+    </insert>
+
 </mapper>

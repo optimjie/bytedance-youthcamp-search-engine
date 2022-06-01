@@ -2,10 +2,12 @@ package com.searchengine.service.impl;
 
 import com.searchengine.dao.UserDao;
 import com.searchengine.entity.LoginUser;
+import com.searchengine.entity.TreeNode;
 import com.searchengine.entity.User;
 import com.searchengine.service.UserService;
 import com.searchengine.utils.JwtUtil;
 import com.searchengine.utils.RedisUtil_db0;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,11 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sun.reflect.generics.tree.Tree;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -87,4 +87,10 @@ public class UserServiceImpl implements UserService {
     public User getUserByName(String username) {
         return userDao.queryOne(username);
     }
+
+    @Override
+    public List<TreeNode> getFavorite(String username) {
+        return userDao.queryAll(username);
+    }
+
 }
