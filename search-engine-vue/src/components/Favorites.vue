@@ -179,11 +179,6 @@ export default {
             })
           );
         }
-        // if (this.treeNodeData[i].name == "默认文件夹") {
-        //   nodes.push(new TreeNode({ id: id, name: name, isLeaf: leaf, dragDisabled: true, editNodeDisabled: true, delNodeDisabled: true,}))
-        // } else {
-        //   nodes.push(new TreeNode({ id: id, name: name, isLeaf: leaf }))
-        // }
       }
       for (let i = 0; i < this.treeNodeData.length; i++) {
         if (this.treeNodeData[i].pid === "0") continue;
@@ -296,7 +291,7 @@ export default {
                 message: "添加成功!",
               });
               this.$emit("notShowDialog");
-              location.reload();
+              // location.reload();
             })
             .catch(() => {
               this.$message({
@@ -333,7 +328,7 @@ export default {
           pid: "0",
           name: name,
         });
-        location.reload();
+        // location.reload();
       } else {
         this.$message.error("登录已失效，请重新登录");
         setTimeout(() => {

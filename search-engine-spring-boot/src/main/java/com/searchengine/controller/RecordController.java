@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
+import com.searchengine.common.CodeCache;
 import com.searchengine.dao.RecordDao;
 import com.searchengine.dao.RecordSegDao;
 import com.searchengine.dao.SegmentationDao;
@@ -19,6 +20,7 @@ import com.searchengine.service.SegmentationService;
 import com.searchengine.service.TService;
 import com.searchengine.utils.RedisUtil_db0;
 import com.searchengine.utils.SocketUtil;
+import com.searchengine.utils.Trie;
 import com.searchengine.utils.jieba.keyword.Keyword;
 import com.searchengine.utils.jieba.keyword.TFIDFAnalyzer;
 import lombok.extern.slf4j.Slf4j;
@@ -159,6 +161,12 @@ public class RecordController {
     @GetMapping("/related_word")
     public List<String> relatedWord(@RequestParam("word") String searchInfo){
         return segmentationService.getAllByWords(searchInfo);
+    }
+
+    @GetMapping("/prefix_word")
+    public List<String> getPrefixWord(@RequestParam("word") String searchInfo) {
+        Trie trie = CodeCache.trie;
+        return trie.getRelatedWords(searchInfo);
     }
 
 

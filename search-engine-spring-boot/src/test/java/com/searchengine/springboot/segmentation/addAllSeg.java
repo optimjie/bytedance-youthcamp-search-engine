@@ -244,7 +244,7 @@ public class addAllSeg {
                         tDao.createNewTable(tableName);
                         tDao.insert2(mp.get(idx), tableName);
                     }
-                    mp = new HashMap<>(100000);
+                    mp = new HashMap<>(100000); 
                 }
 
             }

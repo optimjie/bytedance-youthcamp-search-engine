@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/user/login", "/","/user/logout", "/register", "/search_test", "/related_word", "/imageUpload","/survival","/search_use_split",
-                        "/getFavorites", "/updateTreeNodeName", "/deleteTreeNode", "/addTreeNode").permitAll()//不拦截这些路径
+                        "/getFavorites", "/updateTreeNodeName", "/deleteTreeNode", "/addTreeNode", "/prefix_word").permitAll()//不拦截这些路径
                 .anyRequest().authenticated();
 
     }

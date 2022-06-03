@@ -3,13 +3,35 @@
     <el-row type="flex" justify="end">
       <!-- 将来放用户登录以及收藏夹的东西 -->
       <el-popover
-        placement="bottom"
-        title="收藏夹"
-        width="300"
-        trigger="click"
-        content="将来放收藏夹相关内容，实现效果可以参考edge的收藏夹。"
+          placement="bottom"
+          title="收藏夹"
+          width="300"
+          trigger="click"
+          content="将来放收藏夹相关内容，实现效果可以参考edge的收藏夹。"
       >
-        <el-button slot="reference" icon="el-icon-folder" circle></el-button>
+        <el-button
+            slot="reference"
+            icon="el-icon-folder"
+            circle
+        ></el-button>
+        <div v-if="check">
+          <favorites
+              :username="user.username"
+              :addToFavorite="0"
+              ref="favorites"
+          ></favorites>
+        </div>
+        <div v-if="!check">
+          <a
+              style="
+                    color: #55ab41;
+                    margin-right: 148px;
+                    text-decoration: none;
+                  "
+              href="/login"
+          >对不起,请前往登录</a
+          >
+        </div>
       </el-popover>
       <span>&nbsp;&nbsp;</span>
       <el-popover
@@ -41,28 +63,27 @@
       <div>
         <img src="~@/assets/1057.png" alt="" />
       </div>
-      <el-input
-        @keyup.enter.native="search" 
-        v-model="search_word"
-        placeholder="请输入搜索内容"
-        prefix-icon="el-icon-search"
-      >
+      <el-autocomplete v-model="search_word" style="width: 600px;"
+                       :fetch-suggestions="querySearchAsync" @select="handleSelect"
+                       placeholder="请输入搜索内容" prefix-icon="el-icon-search"
+                       @keyup.enter.native="search">
         <el-button
-          style="margin-right: 10px"
-          slot="suffix"
-          type="text"
-          @click="search"
-          >搜索</el-button
-        >
-      </el-input>
+            style="margin-right: 10px"
+            slot="suffix"
+            type="text"
+            @click="search"
+        >搜索</el-button>
+      </el-autocomplete>
     </el-row>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import favorites from "./Favorites";
 
 export default {
+  components: { favorites },
   data() {
     return {
       search_word: "",
@@ -83,6 +104,32 @@ export default {
     }, 1000 * 60 * 10); //每十分钟检查token
   },
   methods: {
+    async querySearchAsync(queryString, cb) {
+      clearTimeout(this.timeout);
+      var data = []
+      var results = []
+      if (queryString == '') {
+        cb(results);
+      } else {
+        await axios
+          .get("http://localhost:9090/prefix_word?word=" + this.search_word)
+          .then((response) => {
+            data = response.data
+          })
+        for (let i = 0; i < data.length; i++) {
+          results.push({
+            value: data[i]
+          })
+        }
+        cb(results)
+      }
+    },
+    //点击出现搜索后点击的每一项
+    handleSelect(item) {
+      this.id = item.id
+      this.name = item.value
+      this.search()
+    },
     async checkToken() {
       var jwt = JSON.parse(window.localStorage.getItem("access"));
       if (jwt != null) {

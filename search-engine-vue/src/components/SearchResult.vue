@@ -1,7 +1,7 @@
 <template>
   <el-container style="width: 100%">
     <el-header height="20%">
-      <el-row style="height: 200px; width: 1524px; display: flex">
+      <el-row style="height: 200px; width: 100%; display: flex">
         <el-col style="width: 100px; margin-right: 10px">
           <div>
             <a href="/"><img src="~@/assets/1057inRes.png" alt="" /></a>
@@ -9,37 +9,34 @@
         </el-col>
         <el-col>
           <div class="input" style="text-align: left">
-            <el-input
-            @keyup.enter.native="search" 
-              style="width: 560px"
-              v-model="search_word"
-              placeholder="请输入搜索内容"
-              prefix-icon="el-icon-search"
-            >
+            <el-autocomplete v-model="search_word" style="width: 600px;"
+                             :fetch-suggestions="querySearchAsync" @select="handleSelect"
+                             placeholder="请输入搜索内容" prefix-icon="el-icon-search"
+                             @keyup.enter.native="search">
               <template v-slot:suffix>
                 <el-upload
-                  :limit="1"
-                  action="http://localhost:9090/imageUpload"
-                  :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
-                  :before-upload="beforeAvatarUpload"
-                  style="float: left; padding-top: 5px; max-width: 37px"
+                    :limit="1"
+                    action="http://localhost:9090/imageUpload"
+                    :show-file-list="false"
+                    :on-success="handleAvatarSuccess"
+                    :before-upload="beforeAvatarUpload"
+                    style="float: left; padding-top: 5px; max-width: 37px"
                 >
                   <i class="el-input__icon el-icon-camera"></i>
                 </el-upload>
                 <el-button
-                  style="margin-right: 10px; margin-top: 5px"
-                  slot="suffix"
-                  type="text"
-                  @click="searcher"
-                  >搜索</el-button
+                    style="margin-right: 10px; margin-top: 5px"
+                    slot="suffix"
+                    type="text"
+                    @click="searcher"
+                >搜索</el-button
                 >
               </template>
-            </el-input>
+            </el-autocomplete>
           </div>
         </el-col>
         <div>
-          <el-col style="display: flex; float: right; margin-top: 10px">
+          <el-col style="display: flex; float: right;">
             <el-popover
               placement="bottom"
               title="收藏夹"
@@ -304,6 +301,14 @@
     </el-main>
 
     <div v-if="check">
+      <div v-show="false">
+        <favorites
+            :username="user.username"
+            :addToFavorite="1"
+            ref="favorites"
+            @notShowDialog="change"
+        ></favorites>
+      </div>
       <el-dialog
         title="请选择添加位置"
         :visible.sync="addToFavoritedialogVisible"
@@ -318,10 +323,6 @@
         <span>
           <br />
         </span>
-        <!--      <span slot="footer" class="dialog-footer">-->
-        <!--        <el-button @click="addToFavoritedialogVisible = false">取 消</el-button>-->
-        <!--        <el-button type="primary" @click="addToFavoritedialogVisible = false">确 定</el-button>-->
-        <!--      </span>-->
       </el-dialog>
     </div>
   </el-container>
@@ -329,10 +330,7 @@
 
 <script>
 import axios from "axios";
-
 import favorites from "./Favorites";
-// import Favorites from "@/components/Favorites";
-// import AddFavorites from "@/components/AddFavorites";
 
 export default {
   components: { favorites },
@@ -366,10 +364,10 @@ export default {
   },
   mounted() {
     // 不知道为什么只有这样才能获取第一次的值
-    this.addToFavoritedialogVisible = true;
-    setTimeout(() => {
-      this.addToFavoritedialogVisible = false;
-    }, 1);
+    // this.addToFavoritedialogVisible = true;
+    // setTimeout(() => {
+    //   this.addToFavoritedialogVisible = false;
+    // }, 1);
     this.getFirstPage();
     this.getRelatedWord();
     if (window.localStorage.getItem("access") != null) {
@@ -407,7 +405,7 @@ export default {
           _this.loading = false;
           clearInterval();
         }
-      }, 2000);
+      }, 20);
     },
     async checkToken() {
       var jwt = JSON.parse(window.localStorage.getItem("access"));
@@ -598,6 +596,32 @@ export default {
         .get("http://localhost:9090/related_word?word=" + outer.search_word)
         .then((response) => (outer.info = response.data));
       this.relatedWord = this.info;
+    },
+    async querySearchAsync(queryString, cb) {
+      clearTimeout(this.timeout);
+      var data = []
+      var results = []
+      if (queryString == '') {
+        cb(results);
+      } else {
+        await axios
+            .get("http://localhost:9090/prefix_word?word=" + this.search_word)
+            .then((response) => {
+              data = response.data
+            })
+        for (let i = 0; i < data.length; i++) {
+          results.push({
+            value: data[i]
+          })
+        }
+        cb(results)
+      }
+    },
+    //点击出现搜索后点击的每一项
+    handleSelect(item) {
+      this.id = item.id
+      this.name = item.value
+      this.search()
     },
   },
 };

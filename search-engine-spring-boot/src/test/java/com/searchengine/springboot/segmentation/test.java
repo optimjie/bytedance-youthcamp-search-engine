@@ -61,6 +61,9 @@ public class test {
         for (String sentence : sentences) {
             System.out.println(segmenter.process(sentence, JiebaSegmenter.SegMode.INDEX).toString());
         }
+        for (String sentence : sentences) {
+            System.out.println(segmenter.process(sentence, JiebaSegmenter.SegMode.SEARCH).toString());
+        }
     }
 
     @Test
