@@ -38,7 +38,7 @@
         <div>
           <el-col style="display: flex; float: right;">
             <el-popover
-              placement="bottom"
+              placement="left-start"
               title="收藏夹"
               width="300"
               trigger="click"
@@ -53,6 +53,7 @@
                 <favorites
                   :username="user.username"
                   :addToFavorite="0"
+                  :key="timer"
                   ref="favorites"
                 ></favorites>
               </div>
@@ -162,18 +163,19 @@
                     align-items: center;
                   "
                 >
+                  <!-- 收藏按钮 -->
                   <el-button
-                    type="success"
                     @click="addToFavorite(item)"
-                    style="margin-right: 10px"
-                    >收藏</el-button
+                    style="margin-right: 10px;"
+                    icon="el-icon-star-off" circle
+                    ></el-button
                   >
                   <a
                     :href="item.url"
                     target="_blank"
                     style="white-space: nowrap; word-break: break-all"
                   >
-                    <h3 v-html="lightFn(item.caption, search_word1)"></h3>
+                    <h3 v-html="lightFn(item.caption, search_word_not_contain_filter)"></h3>
                   </a>
                 </div>
               </div>
@@ -219,7 +221,7 @@
                         text-overflow: ellipsis;
                       "
                       :style="'width:' + item.width"
-                      v-html="lightFn(item.caption, search_word1)"
+                      v-html="lightFn(item.caption, search_word_not_contain_filter)"
                     ></p>
                   </div>
                 </div>
@@ -288,7 +290,7 @@
                 background
                 @current-change="handleCurrentChange"
                 :current-page="pageNum"
-                :page-size="2"
+                :page-size="15"
                 layout="prev, pager, next, jumper"
                 :total="recordsNum"
               >
@@ -345,6 +347,7 @@ export default {
       check: false,
       search_word: "",
       search_word1: "",
+      search_word_not_contain_filter: "",
       info: "",
       imgAndCaption: [],
       imgAndCaption1: [],
@@ -354,6 +357,7 @@ export default {
       picture_text: 1,
       picTopic1: false,
       addToFavoritedialogVisible: false,
+      timer: ''
     };
   },
   created() {
@@ -364,10 +368,10 @@ export default {
   },
   mounted() {
     // 不知道为什么只有这样才能获取第一次的值
-    // this.addToFavoritedialogVisible = true;
-    // setTimeout(() => {
-    //   this.addToFavoritedialogVisible = false;
-    // }, 1);
+    this.addToFavoritedialogVisible = true;
+    setTimeout(() => {
+      this.addToFavoritedialogVisible = false;
+    }, 1);
     this.getFirstPage();
     this.getRelatedWord();
     if (window.localStorage.getItem("access") != null) {
@@ -509,7 +513,23 @@ export default {
     async search() {
       this.pageNum = 1;
       let outer = this;
+
       this.search_word1 = this.search_word;
+      this.search_word_not_contain_filter = this.search_word
+      var filter = /^-.*?$/
+      var strs = this.search_word_not_contain_filter.trim().split(/\s+/)
+      var idx =  -1;
+      for (let i = 0; i < strs.length; i++) {
+        if (filter.test(strs[i])) {
+          idx = this.search_word_not_contain_filter.indexOf(strs[i])
+          break;
+        }
+      }
+      if (idx != -1) {
+        this.search_word_not_contain_filter = this.search_word_not_contain_filter
+            .substring(0, idx).replace(/(^\s*)|(\s*$)/g, "")
+      }
+
       await axios
         .get(
           "http://localhost:9090/search_use_split?word=" +
@@ -546,6 +566,23 @@ export default {
       this.recordsNum = this.$route.query.recordsNum;
       this.search_word = this.$route.query.word;
       this.search_word1 = this.$route.query.word;
+
+      // 以下代码用于查询结果中过滤词不变红
+      this.search_word_not_contain_filter = this.search_word
+      var filter = /^-.*?$/
+      var strs = this.search_word_not_contain_filter.trim().split(/\s+/)
+      var idx =  -1;
+      for (let i = 0; i < strs.length; i++) {
+        if (filter.test(strs[i])) {
+          idx = this.search_word_not_contain_filter.indexOf(strs[i])
+          break;
+        }
+      }
+      if (idx != -1) {
+        this.search_word_not_contain_filter = this.search_word_not_contain_filter
+            .substring(0, idx).replace(/(^\s*)|(\s*$)/g, "")
+      }
+
       let outer = this;
       await axios
         .get(

@@ -57,6 +57,11 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
+    public List<Record> selectPartialRecords(int limit, int offset) {
+        return recordDao.selectPartialRecords(limit, offset);
+    }
+
+    @Override
     public List<Record> queryRecordByWord(String word) {
         word = "%" + word + "%";
         return recordDao.selectRecordsByWord(word);

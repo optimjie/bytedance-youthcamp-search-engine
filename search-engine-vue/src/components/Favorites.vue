@@ -109,6 +109,10 @@ export default {
     this.idToUrl = new Map();
   },
   methods: {
+    reload() {
+
+      this.$forceUpdate()
+    },
     Token() {
       var jwt = JSON.parse(window.localStorage.getItem("access"));
       if (jwt != null) {
@@ -268,7 +272,6 @@ export default {
     onClick(params) {
       this.Token();
       if (this.token) {
-        // console.log("@@ " + this.caption + " " + this.url)
         if (this.addToFavorite == 1) {
           this.$confirm("收藏到【" + params.name + "】", "提示", {
             confirmButtonText: "确定",
@@ -290,6 +293,7 @@ export default {
                 type: "success",
                 message: "添加成功!",
               });
+              this.reload()
               this.$emit("notShowDialog");
               // location.reload();
             })

@@ -6,7 +6,9 @@ import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.huaban.analysis.jieba.SegToken;
 import com.searchengine.dao.SegmentationDao;
 import com.searchengine.dao.TDao;
+import com.searchengine.entity.Record;
 import com.searchengine.entity.T;
+import com.searchengine.service.RecordService;
 import com.searchengine.service.TService;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,9 @@ class OptimjieTest {
 
     @Autowired
     private SegmentationDao segmentationDao;
+
+    @Autowired
+    private RecordService recordService;
 
     @Test
     void queryRecordFilter() {
@@ -76,5 +81,25 @@ class OptimjieTest {
             }
         }
         System.out.println("=======\n" + sb.toString() + "\n========");
+    }
+
+    @Test
+    void test2() {
+        StringBuilder sb = new StringBuilder();
+        System.out.println("".equals(sb.toString()));
+    }
+
+    @Test
+    void test3() {
+        List<Record> records = recordService.queryAllRecord();
+        System.out.println(records.size());
+    }
+
+    @Test
+    void test4() {
+        List<String> l = new ArrayList<>();
+        l.add("11");
+        l.add("22");
+        tDao.insert1(l);
     }
 }

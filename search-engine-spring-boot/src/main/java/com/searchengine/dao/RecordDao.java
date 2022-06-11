@@ -11,6 +11,8 @@ public interface RecordDao {
 
     List<Record> selectAllRecords();
 
+    List<Record> selectPartialRecords(@Param("limit") int limit, @Param("offset") int offset);
+
     List<Record> selectRecordsByWord(String word);
 
     Record selectById(@Param("id") int id);

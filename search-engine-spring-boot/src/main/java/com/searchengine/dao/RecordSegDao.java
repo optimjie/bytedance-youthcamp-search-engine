@@ -22,5 +22,4 @@ public interface RecordSegDao {
     int updateRecordSeg(RecordSeg recordSeg);
     //批量插入关系表
     boolean insertBatch(@Param("relations")List<RecordSeg> relations);
-
 }

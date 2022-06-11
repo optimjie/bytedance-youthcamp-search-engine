@@ -156,16 +156,21 @@ public class addAllSeg {
      * @date: 2022-05-23 10:53
      */
     public void addSegs() {
-        List<Record> records = recordService.queryAllRecord();
-        List<String> segs = new ArrayList<>(500000);
+        // List<Record> records = recordService.queryAllRecord();
+        List<String> segs = new ArrayList<>();
         BloomFilter<String> bf = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")),10000000);
         if (stopWordsSet == null) {
             stopWordsSet = new HashSet<>();
             loadStopWords(stopWordsSet, this.getClass().getResourceAsStream("/jieba/stop_words.txt"));
         }
-        for (int loop = 0; loop < 75; loop++) {
+        for (int loop = 0; loop < 300; loop++) {
+            List<Record> records = recordService.selectPartialRecords(10000, Math.max(0, loop * 10000));
+            if (loop % 10 == 0 && loop != 0) {  // 这里注意loop应该不等于起始值，不一定非是0，因为起始值会空的，先这样写着。
+                tDao.insert1(segs);
+                segs.clear();
+            }
             for (int i = loop * 10000; i < (loop + 1) * 10000; i++) {
-                Record record = records.get(i);
+                Record record = records.get(i % 10000);
                 String caption = record.getCaption();
                 List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
                 for (SegToken segToken : segTokens) {
@@ -184,13 +189,13 @@ public class addAllSeg {
     @Test
     /**
      * @author: optimjie
-     * @description: 分表按照segId:1~10000,10001~20000.... 因为在关系表很大的时候，主要的瓶颈在于找到所有包含某一个segId的data再将所有的tf值加起来比较大小
+     * @description: 分表按照segId的最后两位来分，这样可以保证每个表是比较均匀的。
+     *  因为在关系表很大的时候，主要的瓶颈在于找到所有包含某一个segId的data再将所有的tf值加起来比较大小
      * @date: 2022-05-23 11:01
      */
     public void addAllSegUseSplit() {
-        List<Record> records = recordService.queryAllRecord();
         List<Segmentation> segmentations = segmentationService.queryAllSeg();
-        Map<String, Integer> wordToId = new HashMap<>();
+        Map<String, Integer> wordToId = new HashMap<>(1000000);
         for (Segmentation seg : segmentations) {
             wordToId.put(seg.getWord(), seg.getId());
         }
@@ -200,9 +205,10 @@ public class addAllSeg {
         }
         Map<Integer, List<T>> mp = new HashMap<>(100000);
         int cnt = 0;
-        for (int loop = 0; loop < 4; loop++) {
+        for (int loop = 0; loop < 300; loop++) {
+            List<Record> records = recordService.selectPartialRecords(10000, Math.max(0, loop * 10000));
             for (int i = loop * 10000; i < (loop + 1) * 10000; i++) {
-                Record record = records.get(i);
+                Record record = records.get(i % 10000);
                 String caption = record.getCaption();
                 List<SegToken> segTokens = jiebaSegmenter.process(caption, JiebaSegmenter.SegMode.INDEX);
                 List<Keyword> keywords = tfidfAnalyzer.analyze(caption,5);
@@ -244,12 +250,18 @@ public class addAllSeg {
                         tDao.createNewTable(tableName);
                         tDao.insert2(mp.get(idx), tableName);
                     }
-                    mp = new HashMap<>(100000); 
+                    mp = new HashMap<>(100000);
                 }
 
             }
         }
-
+        if (cnt > 0) {
+            for (Integer idx : mp.keySet()) {
+                String tableName = "data_seg_relation_" + idx;
+                tDao.createNewTable(tableName);
+                tDao.insert2(mp.get(idx), tableName);
+            }
+        }
     }
 
     private void loadStopWords(Set<String> set, InputStream in){

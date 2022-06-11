@@ -13,6 +13,10 @@
         select * from data
     </select>
 
+    <select id="selectPartialRecords" resultType="com.searchengine.entity.Record">
+        select * from data limit #{limit} offset #{offset}
+    </select>
+
     <select id="selectById" resultType="com.searchengine.entity.Record">
         SELECT * FROM data where id=#{id}
     </select>

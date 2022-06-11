@@ -15,6 +15,8 @@ public interface TDao {
     int getMaxId();
     List<Record> getRecord(@Param("segIds")String segIds, @Param("pageSize")int pageSize, @Param("offset")int offset);
     List<Record> getRecordUseSplit(@Param("info")String info, @Param("pageSize")int pageSize, @Param("offset")int offset);
-    int getRecordsNum(@Param("segIds")String segIds);
+    List<Record> getRecordUseSplitFilter(@Param("info")String info, @Param("filterInfo")String filterInfo, @Param("pageSize")int pageSize, @Param("offset")int offset);
+    int getRecordsNum(@Param("info")String info);
+    int getRecordsNumFilter(@Param("info")String info, @Param("filterInfo")String filterInfo);
     int createNewTable(@Param("tableName")String tableName);
 }

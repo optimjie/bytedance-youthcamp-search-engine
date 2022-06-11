@@ -3,7 +3,7 @@
     <el-row type="flex" justify="end">
       <!-- 将来放用户登录以及收藏夹的东西 -->
       <el-popover
-          placement="bottom"
+          placement="left-start"
           title="收藏夹"
           width="300"
           trigger="click"
