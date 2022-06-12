@@ -10,7 +10,7 @@ Vue，Element UI
 
 #### 后端
 
-Spring Boot，MySQL，MyBatis，Spring Security，Redis
+Spring Boot，MySQL，MyBatis，Spring Security，Redis， PyTorch
 
 ### 功能说明
 
@@ -36,6 +36,7 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis
 2. 关联度算法采用[tfidf算法]([tf-idf - 维基百科，自由的百科全书 (wikipedia.org)](https://zh.m.wikipedia.org/zh-cn/Tf-idf))。
 3. 为了加快搜索速度，使用加B+树索引以及分表来进行优化。
 4. 搜索时搜索下拉框联想词推荐使用[Trie树]([Trie - 维基百科，自由的百科全书 (wikipedia.org)](https://zh.m.wikipedia.org/zh-cn/Trie))（也称前缀树）实现。
+4. 以图搜图采用[CLIP](https://github.com/openai/CLIP)预训练模型对图像进行编码提取特征，通过特征之间余弦相似度搜索相似图片。
 
 ### 演示图
 
@@ -47,7 +48,7 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis
 | 搜索过滤：过滤前&过滤后 | <img src="https://s2.loli.net/2022/06/12/ioUD3QgHMudt47j.png" alt="s1.png" style="zoom:50%;" /> | <img src="https://s2.loli.net/2022/06/12/q1WXl8vBtbLzaDk.png" alt="s8.png" style="zoom:50%;" /> |
 | 用户注册&用户登录       | <img src="https://s2.loli.net/2022/06/12/49bkQuWnetHFZsM.png" alt="s4.png" style="zoom:50%;" /> | <img src="https://s2.loli.net/2022/06/12/j9xfZrQ5Y2wE3aF.png" alt="s5.png" style="zoom:50%;" /> |
 | 收藏夹&添加到收藏夹     | <img src="https://s2.loli.net/2022/06/12/K8gi9CpZOcBtsnq.png" alt="s6.png" style="zoom:50%;" /> | <img src="https://s2.loli.net/2022/06/12/ZjLc25grxzDiYX4.png" alt="s7.png" style="zoom:50%;" /> |
-| 以图搜图                |                                                              |                                                              |
+| 以图搜图                | [![XgoaEd.png](https://s1.ax1x.com/2022/06/12/XgoaEd.png)](https://imgtu.com/i/XgoaEd) | [![XgonHJ.png](https://s1.ax1x.com/2022/06/12/XgonHJ.png)](https://imgtu.com/i/XgonHJ) |
 
 
 
