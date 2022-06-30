@@ -1,4 +1,4 @@
-package com.searchengine;
+package com.searchengine.config;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import org.springframework.security.web.authentication.logout.LogoutFilter;

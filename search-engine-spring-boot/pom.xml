@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.search-engine</groupId>
-    <artifactId>spring-boot</artifactId>
+    <artifactId>search-engine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-boot</name>
+    <name>search-engine</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -120,7 +120,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.3.7.RELEASE</version>
                 <configuration>
-                    <mainClass>com.searchengine.springboot.Application</mainClass>
+                    <mainClass>com.searchengine.SearchEngineApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

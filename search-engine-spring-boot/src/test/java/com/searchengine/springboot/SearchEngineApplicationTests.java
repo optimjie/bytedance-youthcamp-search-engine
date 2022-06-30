@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @SpringBootTest
-class ApplicationTests {
+class SearchEngineApplicationTests {
 
     @Autowired
     private RecordSegDao recordSegDao;

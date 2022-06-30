@@ -17,6 +17,15 @@
 2. 将[悟空数据集]((https://wukong-dataset.github.io/wukong-dataset/download.html))的数据导入到data表中。
 3. 运行search-engine-spring-boot\src\test\java\com\searchengine\springboot\segmentation\addAllSeg.java中的addSegs方法，用于添加分词，再运行addAllSegUseSplit方法，用于创建关系表。（注意修改loop，data表中有多少数据就添加多少）
 
+- **前端启动**（保证你本地安装了node.js环境）
+  1. git clone 项目 下来之后，cd search-engine-vue 
+  2. 执行npm install    && npm run serve
+  3. 启动成功访问：http://localhost:8080/即可
+- **后端启动**
+  1. IDEA打开search-engine-spring-boot，刷新maven
+  2. 修改application.yml的数据库与密码 （mysql和redis）
+  3. 启动redis
+
 ### 技术栈
 
 #### 前端
@@ -45,7 +54,7 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis， PyTorch
    - 图片搜索结果以缩略图展示，支持点击打开原图。
 10. 支持以图搜图
     - 用户上传一张图片，可以搜索出关联的图片。
-  
+
 ### 技术说明
 
 1. 分词采用开源的[jieba](https://github.com/huaban/jieba-analysis)分词库。首先将[悟空数据集](https://wukong-dataset.github.io/wukong-dataset/download.html)所有的文本数据进行分词创建倒排索引，并建立分词-文本关系表。
@@ -70,4 +79,9 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis， PyTorch
 
 
 
-​	
+### Tips
+
+若本地数据库是5.6的话可能会导入错误
+
+1. 需要将`utf8mb4`变为`utf8`
+2. 将`utf8mb4_0900_ai_ci`变为`utf8_general_ci
