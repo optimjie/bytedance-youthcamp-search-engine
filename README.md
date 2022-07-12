@@ -1,3 +1,5 @@
+## 过段时间有空了将所有的索引放到内存中。这里参考ES的时间，自己实现简易的FST以及压缩算法。
+
 - [项目简介](#项目简介)
 - [项目运行](#项目运行)
 - [技术栈](#技术栈)
@@ -45,7 +47,7 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis， PyTorch
    - 图片搜索结果以缩略图展示，支持点击打开原图。
 10. 支持以图搜图
     - 用户上传一张图片，可以搜索出关联的图片。
-  
+
 ### 技术说明
 
 1. 分词采用开源的[jieba](https://github.com/huaban/jieba-analysis)分词库。首先将[悟空数据集](https://wukong-dataset.github.io/wukong-dataset/download.html)所有的文本数据进行分词创建倒排索引，并建立分词-文本关系表。
