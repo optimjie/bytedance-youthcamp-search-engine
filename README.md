@@ -21,6 +21,15 @@
 2. 将[悟空数据集]((https://wukong-dataset.github.io/wukong-dataset/download.html))的数据导入到data表中。
 3. 运行search-engine-spring-boot\src\test\java\com\searchengine\springboot\segmentation\addAllSeg.java中的addSegs方法，用于添加分词，再运行addAllSegUseSplit方法，用于创建关系表。（注意修改loop，data表中有多少数据就添加多少）
 
+- **前端启动**（保证你本地安装了node.js环境）
+  1. git clone 项目 下来之后，cd search-engine-vue 
+  2. 执行npm install    && npm run serve
+  3. 启动成功访问：http://localhost:8080/即可
+- **后端启动**
+  1. IDEA打开search-engine-spring-boot，刷新maven
+  2. 修改application.yml的数据库与密码 （mysql和redis）
+  3. 启动redis
+
 ### 技术栈
 
 #### 前端
@@ -74,4 +83,9 @@ Spring Boot，MySQL，MyBatis，Spring Security，Redis， PyTorch
 
 
 
-​	
+### Tips
+
+若本地数据库是5.6的话可能会导入错误
+
+1. 需要将`utf8mb4`变为`utf8`
+2. 将`utf8mb4_0900_ai_ci`变为`utf8_general_ci
